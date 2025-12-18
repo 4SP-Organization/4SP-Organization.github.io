@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4SP - AUTHENTICATION</title>
-    <meta name="description" content="Log into or create your 4SP account to access the student toolkit.">
+    <title>4SP - CONNECT</title>
+    <meta name="description" content="Connect your local 4SP client to the organization database.">
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,37 +12,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    <script>
-        (function() {
-            const originalError = console.error;
-            const originalWarn = console.warn;
-            console.error = (...args) => {
-                if (args[0] && typeof args[0] === 'string' && (args[0].includes('browser-polyfill') || args[0].includes('object Object'))) return;
-                originalError.apply(console, args);
-            };
-            console.warn = (...args) => {
-                if (args[0] && typeof args[0] === 'string' && (args[0].includes('cdn.tailwindcss.com') || args[0].includes('Cross-Origin-Opener-Policy'))) return;
-                originalWarn.apply(console, args);
-            };
-        })();
-    </script>
-
     <script src="../navigation-mini.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
+        // Silence noisy extension/COOP warnings
+        (function() {
+            const oE = console.error; const oW = console.warn;
+            console.error = (...a) => { if (a[0]?.includes?.('browser-polyfill') || a[0]?.includes?.('object Object')) return; oE.apply(console, a); };
+            console.warn = (...a) => { if (a[0]?.includes?.('cdn.tailwindcss.com') || a[0]?.includes?.('Cross-Origin-Opener-Policy')) return; oW.apply(console, a); };
+        })();
+
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        'custom-darkest-gray': '#040404',
-                        'custom-dark-gray': '#111111',
-                        'custom-medium-gray': '#252525',
-                        'custom-light-gray': '#505050',
-                        'custom-lighter-gray': '#808080',
-                    },
-                    borderRadius: {
-                        'xl-custom': '1.5rem',
+                        'custom-darkest': '#040404',
+                        'custom-dark': '#111111',
+                        'custom-medium': '#252525',
+                        'custom-light': '#505050',
+                        'custom-lighter': '#808080',
                     }
                 }
             }
@@ -50,123 +40,104 @@
     </script>
 
     <style>
-        body { font-family: 'Geist', sans-serif; background-color: #040404; }
-        .glass-box {
-            background-color: #111111;
-            border: 1px solid #252525;
-            border-radius: 1.5rem;
-        }
-        .input-field {
-            background-color: #0c0c0c;
-            border: 1px solid #252525;
-            transition: border-color 0.2s;
-        }
-        .input-field:focus {
-            border-color: #505050;
-            outline: none;
-        }
-        .btn-primary {
-            background-color: #252525;
-            border: 1px solid #333333;
-            transition: background-color 0.2s;
-        }
-        .btn-primary:hover { background-color: #333333; }
-        
-        /* Modal Design Matching */
-        #code-modal-overlay {
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background-color: #111111;
-            border: 1px solid #252525;
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
+        body { font-family: 'Geist', sans-serif; background-color: #000000; color: white; }
+        .glass-box { background-color: #111111; border: 1px solid #252525; border-radius: 1.5rem; }
+        .input-field { background-color: #0c0c0c; border: 1px solid #252525; color: white; border-radius: 0.75rem; width: 100%; padding: 0.75rem 1rem; transition: border-color 0.2s; }
+        .input-field:focus { border-color: #0070f3; outline: none; }
+        .btn-provider { background-color: #181818; border: 1px solid #252525; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.75rem; border-radius: 0.75rem; width: 100%; }
+        .btn-provider:hover { background-color: #252525; transform: translateY(-1px); }
+        .btn-primary { background-image: linear-gradient(90deg, #0070f3, #f81ce5); border-radius: 0.75rem; padding: 0.75rem; font-weight: 500; text-align: center; width: 100%; transition: opacity 0.2s; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-dv-download { background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(192, 132, 252, 0.3); color: #c084fc; border-radius: 0.75rem; padding: 1rem; text-align: center; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; transition: all 0.2s; }
+        .btn-dv-download:hover { background: rgba(147, 51, 234, 0.2); border-color: rgba(192, 132, 252, 1); color: white; }
     </style>
 </head>
-<body class="text-white min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
 
     <div id="navbar-container"></div>
 
-    <main class="flex-grow flex items-center justify-center p-6">
-        <div class="max-w-md w-full glass-box p-8 space-y-8">
-            <div class="text-center">
-                <h1 class="text-3xl font-light tracking-tight">4SP Authentication</h1>
-                <p class="text-custom-lighter-gray mt-2 font-light">Access your student toolkit</p>
+    <main class="flex-grow flex items-center justify-center p-6 mt-12">
+        <div class="max-w-md w-full glass-box p-8 space-y-6">
+            
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl font-light tracking-tight">4SP - CONNECT</h1>
+                <p class="text-custom-lighter text-sm font-light">Link your local client to the 4SP Database.</p>
             </div>
 
-            <div id="auth-ui" class="space-y-4">
-                <div id="logged-out-ui" class="space-y-4">
-                    <button id="google-login-btn" class="w-full btn-primary py-3 px-4 rounded-xl flex items-center justify-center gap-3">
-                        <i class="fab fa-google"></i> Continue with Google
-                    </button>
-                    <button id="twitter-login-btn" class="w-full btn-primary py-3 px-4 rounded-xl flex items-center justify-center gap-3">
-                        <i class="fab fa-x-twitter"></i> Continue with X
-                    </button>
-                    <div class="relative py-2">
-                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-custom-medium-gray"></div></div>
-                        <div class="relative flex justify-center text-xs uppercase"><span class="bg-custom-dark-gray px-2 text-custom-light-gray">Limited Access</span></div>
-                    </div>
-                    <p class="text-xs text-center text-custom-light-gray">Authentication is required for cloud-sync and personal tools.</p>
+            <div id="auth-panel" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="googleBtn" class="btn-provider"><i class="fab fa-google"></i></button>
+                    <button id="githubBtn" class="btn-provider"><i class="fab fa-github"></i></button>
+                    <button id="microsoftBtn" class="btn-provider"><i class="fab fa-microsoft"></i></button>
+                    <button id="twitterBtn" class="btn-provider"><i class="fab fa-x-twitter"></i></button>
                 </div>
 
-                <div id="logged-in-ui" class="hidden space-y-6">
-                    <div class="text-center space-y-2">
-                        <div id="user-avatar-container" class="w-20 h-20 mx-auto rounded-full border-2 border-custom-medium-gray overflow-hidden"></div>
-                        <h2 id="user-display-name" class="text-xl font-medium"></h2>
-                        <p id="user-email" class="text-custom-lighter-gray text-sm"></p>
-                    </div>
+                <div class="relative py-2">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-custom-medium"></div></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-custom-dark px-2 text-custom-light">OR EMAIL</span></div>
+                </div>
 
-                    <div class="glass-box bg-custom-darkest-gray p-4 space-y-3">
-                        <label class="text-xs uppercase tracking-widest text-custom-light-gray font-bold">Access Code</label>
-                        <div class="flex items-center justify-between gap-4">
-                            <span id="current-code" class="font-mono text-lg text-purple-400">None</span>
-                            <div class="flex gap-2">
-                                <button id="copy-code-btn" class="p-2 hover:text-white text-custom-light-gray transition" title="Copy Code">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                                <button id="generate-code-btn" class="p-2 hover:text-white text-custom-light-gray transition" title="New Code">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
+                <div class="space-y-3">
+                    <input type="email" id="email" placeholder="Email Address" class="input-field">
+                    <input type="password" id="password" placeholder="Password" class="input-field">
+                    <button id="loginBtn" class="btn-primary">Connect Account</button>
+                </div>
+                
+                <p class="text-center text-xs text-custom-light">
+                    No account? <button id="showRegister" class="text-purple-400 hover:underline">Create a 4SP ID</button>
+                </p>
+            </div>
+
+            <div id="register-panel" class="hidden space-y-4">
+                <h2 class="text-xl font-light text-center">New Organization ID</h2>
+                <input type="text" id="reg-username" placeholder="Choose a Username" class="input-field">
+                <input type="email" id="reg-email" placeholder="Email Address" class="input-field">
+                <input type="password" id="reg-password" placeholder="Create Password" class="input-field">
+                <button id="doRegister" class="btn-primary">Create and Connect</button>
+                <button id="backToLogin" class="w-full text-xs text-custom-light hover:text-white">Back to connection</button>
+            </div>
+
+            <div id="connected-panel" class="hidden space-y-6">
+                <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-custom-medium">
+                    <div id="u-avatar" class="w-14 h-14 rounded-full bg-custom-medium flex items-center justify-center overflow-hidden text-xl"></div>
+                    <div>
+                        <h2 id="u-name" class="font-medium">User</h2>
+                        <p id="u-email" class="text-xs text-custom-lighter"></p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[10px] uppercase tracking-widest text-custom-light font-bold">Local Client</label>
+                    <a href="../4simpleproblems_dv.html" class="btn-dv-download">
+                        <i class="fas fa-cloud-arrow-down"></i> Download 4SP DV Client
+                    </a>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] uppercase tracking-widest text-custom-light font-bold">Access Code</label>
+                        <span class="text-[10px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded uppercase font-bold">Connected</span>
+                    </div>
+                    <div class="flex items-center justify-between bg-custom-darkest rounded-xl p-4 border border-custom-medium">
+                        <span id="current-code" class="font-mono text-purple-400">Loading...</span>
+                        <div class="flex gap-1 text-custom-light">
+                            <button id="copyCode" class="p-2 hover:text-white"><i class="fas fa-copy"></i></button>
+                            <button id="genCode" class="p-2 hover:text-white"><i class="fas fa-sync-alt"></i></button>
                         </div>
                     </div>
-
-                    <div id="code-gen-message" class="text-center text-xs"></div>
-
-                    <button id="logoutBtn" class="w-full border border-red-900/30 text-red-400 hover:bg-red-900/20 py-3 rounded-xl transition text-sm">
-                        Log Out of Account
-                    </button>
                 </div>
+
+                <button id="logoutBtn" class="w-full border border-red-900/20 text-red-500/80 hover:bg-red-900/20 py-3 rounded-xl transition text-sm">Disconnect</button>
             </div>
+
+            <div id="status-msg" class="text-center text-xs font-light"></div>
         </div>
     </main>
 
-    <div id="code-modal-overlay" class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
-        <div class="modal-content w-full max-w-sm p-8 space-y-6">
-            <div class="text-center space-y-2">
-                <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-key text-xl"></i>
-                </div>
-                <h3 class="text-xl font-medium text-white">Your Access Code</h3>
-                <p class="text-sm text-custom-lighter-gray font-light">Use this code to link your local files to your 4SP cloud account.</p>
-            </div>
-
-            <div class="bg-black/40 border border-custom-medium-gray rounded-xl p-4 text-center">
-                <span id="modal-display-code" class="text-2xl font-mono tracking-wider text-purple-400 select-all">-------</span>
-            </div>
-
-            <button id="close-modal-btn" class="w-full btn-primary py-3 rounded-xl text-sm font-medium">
-                Got it
-            </button>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, TwitterAuthProvider, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAZBKAckVa4IMvJGjcyndZx6Y1XD52lgro",
@@ -181,70 +152,113 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const loggedInUI = document.getElementById('logged-in-ui');
-        const loggedOutUI = document.getElementById('logged-out-ui');
-        const codeModal = document.getElementById('code-modal-overlay');
+        const panels = {
+            auth: document.getElementById('auth-panel'),
+            reg: document.getElementById('register-panel'),
+            connected: document.getElementById('connected-panel')
+        };
 
-        function toggleUI(user) {
+        function showStatus(txt, isError = false) {
+            const msg = document.getElementById('status-msg');
+            msg.textContent = txt;
+            msg.className = `text-center text-xs font-light ${isError ? 'text-red-400' : 'text-purple-400'}`;
+        }
+
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                loggedInUI.classList.remove('hidden');
-                loggedOutUI.classList.add('hidden');
-                document.getElementById('user-display-name').textContent = user.displayName || 'User';
-                document.getElementById('user-email').textContent = user.email;
-                
-                const avatarImg = user.photoURL ? `<img src="${user.photoURL}" class="w-full h-full object-cover">` : `<div class="w-full h-full bg-custom-medium-gray flex items-center justify-center text-xl">${user.displayName?.charAt(0) || 'U'}</div>`;
-                document.getElementById('user-avatar-container').innerHTML = avatarImg;
-                
-                fetchUserCode(user.uid);
+                // Ensure record exists in DB
+                const userRef = doc(db, "users", user.uid);
+                const snap = await getDoc(userRef);
+
+                if (!snap.exists()) {
+                    // New user from Social Login without a DB record - redirect to registration style username prompt
+                    panels.auth.classList.add('hidden');
+                    panels.reg.classList.remove('hidden');
+                    document.getElementById('reg-email').value = user.email;
+                    document.getElementById('reg-email').disabled = true;
+                    showStatus("Please complete your profile.");
+                    return;
+                }
+
+                // Show Dashboard
+                panels.auth.classList.add('hidden');
+                panels.reg.classList.add('hidden');
+                panels.connected.classList.remove('hidden');
+
+                document.getElementById('u-name').textContent = snap.data().username || user.displayName || 'Member';
+                document.getElementById('u-email').textContent = user.email;
+                const avatar = document.getElementById('u-avatar');
+                avatar.innerHTML = user.photoURL ? `<img src="${user.photoURL}" class="w-full h-full object-cover">` : `<i class="fas fa-user text-custom-light"></i>`;
+
+                onSnapshot(userRef, (d) => {
+                    document.getElementById('current-code').textContent = d.data()?.code || 'None';
+                });
+
             } else {
-                loggedInUI.classList.add('hidden');
-                loggedOutUI.classList.remove('hidden');
+                panels.connected.classList.add('hidden');
+                panels.auth.classList.remove('hidden');
             }
+        });
+
+        // Provider Auth
+        async function popAuth(provider) {
+            try { await signInWithPopup(auth, provider); } catch(e) { showStatus(e.message, true); }
         }
 
-        async function fetchUserCode(uid) {
-            const userRef = doc(db, "users", uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists() && userSnap.data().code) {
-                document.getElementById('current-code').textContent = userSnap.data().code;
-            } else {
-                document.getElementById('current-code').textContent = 'None';
-            }
-        }
+        document.getElementById('googleBtn').onclick = () => popAuth(new GoogleAuthProvider());
+        document.getElementById('githubBtn').onclick = () => popAuth(new GithubAuthProvider());
+        document.getElementById('twitterBtn').onclick = () => popAuth(new TwitterAuthProvider());
+        document.getElementById('microsoftBtn').onclick = () => popAuth(new OAuthProvider('microsoft.com'));
 
-        async function handleLogin(provider) {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Login failed", error);
-            }
-        }
+        // Email Auth
+        document.getElementById('loginBtn').onclick = async () => {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            try { await signInWithEmailAndPassword(auth, e, p); } catch(e) { showStatus("Check credentials.", true); }
+        };
 
-        onAuthStateChanged(auth, toggleUI);
-
-        document.getElementById('google-login-btn').addEventListener('click', () => handleLogin(new GoogleAuthProvider()));
-        document.getElementById('twitter-login-btn').addEventListener('click', () => handleLogin(new TwitterAuthProvider()));
-        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
-
-        document.getElementById('generate-code-btn').addEventListener('click', async () => {
+        // Registration
+        document.getElementById('doRegister').onclick = async () => {
             const user = auth.currentUser;
-            if (!user) return;
-            const newCode = '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase();
-            await setDoc(doc(db, "users", user.uid), { code: newCode }, { merge: true });
-            document.getElementById('current-code').textContent = newCode;
-            document.getElementById('modal-display-code').textContent = newCode;
-            codeModal.classList.remove('hidden');
-        });
+            const username = document.getElementById('reg-username').value;
+            
+            if (username.length < 3) return showStatus("Username too short", true);
 
-        document.getElementById('close-modal-btn').addEventListener('click', () => codeModal.classList.add('hidden'));
+            try {
+                let uid = user?.uid;
+                if (!user) {
+                    const e = document.getElementById('reg-email').value;
+                    const p = document.getElementById('reg-password').value;
+                    const cred = await createUserWithEmailAndPassword(auth, e, p);
+                    uid = cred.user.uid;
+                    await sendEmailVerification(cred.user);
+                }
+                
+                await setDoc(doc(db, "users", uid), {
+                    username: username,
+                    email: user?.email || document.getElementById('reg-email').value,
+                    createdAt: serverTimestamp(),
+                    code: '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase()
+                });
+                location.reload();
+            } catch(e) { showStatus(e.message, true); }
+        };
 
-        document.getElementById('copy-code-btn').addEventListener('click', () => {
-            const code = document.getElementById('current-code').textContent;
-            if (code !== 'None') {
-                navigator.clipboard.writeText(code);
-                alert('Code copied to clipboard!');
-            }
-        });
+        // Access Code Utilities
+        document.getElementById('genCode').onclick = async () => {
+            const code = '4SP-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { code });
+        };
+
+        document.getElementById('copyCode').onclick = () => {
+            navigator.clipboard.writeText(document.getElementById('current-code').textContent);
+            showStatus("Code Copied!");
+        };
+
+        document.getElementById('logoutBtn').onclick = () => signOut(auth);
+        document.getElementById('showRegister').onclick = () => { panels.auth.classList.add('hidden'); panels.reg.classList.remove('hidden'); };
+        document.getElementById('backToLogin').onclick = () => { panels.reg.classList.add('hidden'); panels.auth.classList.remove('hidden'); };
+
     </script>
 </body>
 </html>
