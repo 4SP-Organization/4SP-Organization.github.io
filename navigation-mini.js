@@ -168,7 +168,7 @@ const applyCounterZoom = () => {
                     <i class="fa-solid fa-user"></i>
                 </button>
                 <div id="auth-menu-container" class="auth-menu-container closed">
-                    <a href="/authentication.html" class="auth-menu-link"><i class="fa-solid fa-lock w-5"></i>Authenticate</a>
+                    <a href="/connection.html" class="auth-menu-link"><i class="fa-solid fa-lock w-5"></i>Connect</a>
                     ${getGeneralLinks()}
                 </div>
             </div>
