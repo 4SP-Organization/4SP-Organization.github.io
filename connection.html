@@ -9,10 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../navigation-mini.js"></script>
-
     <script>
         // Unified Tailwind CSS configuration for a consistent dark theme
         tailwind.config = {
@@ -103,8 +101,8 @@
                         <p class="text-custom-light-gray text-center mb-6">You are signed in as <span id="userEmail" class="text-white font-medium">...</span></p>
                         
                         <div id="generatorBox" class="flex flex-col items-center">
-                            <button id="generateBtn" class="w-full p-4 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-indigo-600 hover:bg-indigo-700 transition mb-6">
-                                GENERATE CODE
+                            <button id="generateBtn" class="w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-6">
+                                Generate Code
                             </button>
 
                             <div id="resultContainer" class="w-full hidden flex-col items-center">
@@ -129,20 +127,20 @@
                     </p>
                     
                     <button id="googleAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/google-icon.png" alt="Google Logo" class="w-6 h-6 mr-3">
+                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/google-icon.png" alt="Google Logo" class="w-6 h-6 mr-3">
                         Continue with Google
                     </button>
                     <button id="microsoftAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/microsoft.png" alt="Microsoft Logo" class="w-6 h-6 mr-3">
+                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/microsoft.png" alt="Microsoft Logo" class="w-6 h-6 mr-3">
                         Continue with Microsoft
                     </button>
                     <button id="githubAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/github-mark-white.png" alt="GitHub Logo" class="w-6 h-6 mr-3">
+                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/github-mark-white.png" alt="GitHub Logo" class="w-6 h-6 mr-3">
                         Continue with GitHub
                     </button>
                     
                     <button id="twitterAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/gh/4simpleproblems-v5/v5-4simpleproblems-dv@main/images/x.png" alt="X Logo" class="w-6 h-6 mr-3">
+                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/x.png" alt="X Logo" class="w-6 h-6 mr-3">
                         Continue with X
                     </button>
 
