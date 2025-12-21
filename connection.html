@@ -163,6 +163,17 @@
     </footer>
 
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+            GoogleAuthProvider,
+            GithubAuthProvider,
+            TwitterAuthProvider,
+            OAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
@@ -172,7 +183,9 @@
             where,
             getDocs,
             limit,
-            orderBy
+            orderBy,
+            collection,
+            writeBatch
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = {
