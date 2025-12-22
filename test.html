@@ -397,7 +397,10 @@
             } else {
                 // LOGGED OUT
                 switchView('login'); // Default to login view
-                unauthSocialContainer.classList.remove('hidden'); // Show social buttons
+                
+                // IMPORTANT FIX: Ensure social buttons are visible and inline style is reset to flex
+                unauthSocialContainer.classList.remove('hidden'); 
+                unauthSocialContainer.style.display = 'flex'; 
                 
                 authCodeContainer.style.display = 'none';
                 authCodeContainer.classList.add('hidden');
