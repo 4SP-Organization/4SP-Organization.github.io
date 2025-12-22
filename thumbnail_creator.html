@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4SP Thumbnail Creator</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --menu-bg: #000000;
+            --menu-border: #333;
+        }
+
+        body { 
+            font-family: 'Geist', sans-serif; 
+            background-color: #040404; 
+            color: #c0c0c0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Control Panel Styling */
+        #controls-panel {
+            width: 320px;
+            background-color: #0d0d0d;
+            border-right: 1px solid #1a1a1a;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        /* The Main Stage */
+        #stage-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+            padding: 2rem;
+        }
+
+        /* The 16:9 Thumbnail Frame */
+        #thumbnail-frame {
+            width: 100%;
+            max-width: 1280px; /* Base editing size */
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+
+        /* Background Image Layer */
+        #bg-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.05); /* Slight scale to prevent blur edges */
+            z-index: 0;
+            transition: filter 0.2s ease;
+        }
+
+        /* Content Overlay Layer */
+        #content-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through if needed */
+        }
+
+        /* Title Styling */
+        #thumb-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* Width from left edge to middle */
+            width: 50%; 
+            height: 100%;
+            /* Specific padding to not touch edges */
+            padding: 4rem; 
+            box-sizing: border-box;
+            
+            /* Text setup */
+            color: white;
+            font-family: 'Geist', sans-serif;
+            font-weight: 700;
+            font-size: 4rem; 
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: flex-start; /* Align to top */
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            overflow-wrap: break-word;
+        }
+
+        /* Logo Styling */
+        #thumb-logo {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 3rem 4rem; /* Top/Right padding */
+            width: 120px; /* Adjust based on logo needs */
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        /* Inputs Styling */
+        .control-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-dark {
+            width: 100%;
+            background: #040404;
+            border: 1px solid #333;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-family: 'Geist', sans-serif;
+            margin-bottom: 0.5rem;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: #8b5cf6;
+            background: transparent;
+        }
+
+        /* Button Styling */
+        .btn-action {
+            background: white;
+            color: black;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-action:hover { opacity: 0.9; }
+
+        /* Fullscreen Helper Class */
+        body.is-fullscreen #controls-panel { display: none; }
+        body.is-fullscreen #stage-container { padding: 0; background: black; }
+        body.is-fullscreen #thumbnail-frame { 
+            max-width: none; 
+            width: 100vw; 
+            height: 100vh; 
+            border: none; 
+            box-shadow: none;
+        }
+        
+        /* Adjust font size for different viewports dynamically via JS, but base CSS here */
+        @media (max-width: 1000px) {
+            #controls-panel { display: none; } /* Hide controls on mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flex h-screen w-full">
+        <aside id="controls-panel">
+            <div class="mb-4 pb-4 border-b border-[#1a1a1a]">
+                <h2 class="text-white font-bold text-xl mb-1">4SP Thumbnailer</h2>
+                <p class="text-xs text-gray-500">Create standard assets</p>
+            </div>
+
+            <div class="control-group">
+                <label>Video Title</label>
+                <textarea id="input-title" rows="3" class="input-dark" placeholder="Enter title here...">The Rapid Evolution of 4SP</textarea>
+            </div>
+
+            <div class="control-group">
+                <label>Background Image</label>
+                <input type="file" id="input-file" accept="image/*" class="text-xs text-gray-400 mb-2">
+                <input type="text" id="input-bg-url" class="input-dark" placeholder="Or paste Image URL...">
+            </div>
+
+            <div class="control-group">
+                <label>Blur Intensity: <span id="val-blur">0px</span></label>
+                <input type="range" id="range-blur" min="0" max="20" value="0" step="0.5">
+            </div>
+
+            <div class="control-group">
+                <label>Brightness: <span id="val-bright">50%</span></label>
+                <input type="range" id="range-bright" min="0" max="100" value="50">
+            </div>
+
+            <div class="mt-auto pt-4 border-t border-[#1a1a1a]">
+                <button id="btn-fullscreen" class="btn-action">
+                    <i class="fa-solid fa-expand"></i> Enter Fullscreen
+                </button>
+                <p class="text-xs text-center text-gray-600 mt-2">Press 'Esc' to exit fullscreen</p>
+            </div>
+        </aside>
+
+        <main id="stage-container">
+            <div id="thumbnail-frame">
+                <img id="bg-layer" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" alt="Background">
+                
+                <div id="content-layer">
+                    <h1 id="thumb-title">The Rapid Evolution of 4SP</h1>
+                    
+                    <img id="thumb-logo" src="/images/logo.png" onerror="this.src='https://placehold.co/200x200/black/white?text=4SP'" alt="4SP Logo">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- ELEMENTS ---
+        const inputTitle = document.getElementById('input-title');
+        const inputBgUrl = document.getElementById('input-bg-url');
+        const inputFile = document.getElementById('input-file');
+        const rangeBlur = document.getElementById('range-blur');
+        const rangeBright = document.getElementById('range-bright');
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        
+        // Display Elements
+        const thumbTitle = document.getElementById('thumb-title');
+        const bgLayer = document.getElementById('bg-layer');
+        const thumbnailFrame = document.getElementById('thumbnail-frame');
+
+        // Value Displays
+        const valBlur = document.getElementById('val-blur');
+        const valBright = document.getElementById('val-bright');
+
+        // --- STATE & UPDATES ---
+        
+        function updateFilters() {
+            const blur = rangeBlur.value;
+            const bright = rangeBright.value; // Map slider 0-100 to brightness 0.1-1.5 roughly
+            
+            // Mapping brightness: 50 is "normal" (100%), 0 is black, 100 is brighter
+            // Let's make the range intuitive: 0% is dark, 100% is normal source brightness? 
+            // Actually usually for backgrounds we want to darken them. 
+            // Let's assume the slider is direct Brightness %.
+            
+            bgLayer.style.filter = `blur(${blur}px) brightness(${bright}%)`;
+            
+            valBlur.innerText = `${blur}px`;
+            valBright.innerText = `${bright}%`;
+        }
+
+        // Event Listeners
+        inputTitle.addEventListener('input', (e) => {
+            thumbTitle.innerText = e.target.value;
+        });
+
+        // Background URL
+        inputBgUrl.addEventListener('input', (e) => {
+            if(e.target.value) bgLayer.src = e.target.value;
+        });
+
+        // Background File Upload
+        inputFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    bgLayer.src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        rangeBlur.addEventListener('input', updateFilters);
+        rangeBright.addEventListener('input', updateFilters);
+
+        // --- FULLSCREEN LOGIC ---
+        
+        btnFullscreen.addEventListener('click', () => {
+            const elem = document.documentElement; // Make the whole page fullscreen
+            
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+
+            document.body.classList.add('is-fullscreen');
+            
+            // When in fullscreen, we might want to scale the font up if the screen is massive
+            // For now, viewport units (vw) or just high-res screenshotting works best.
+        });
+
+        // Listen for exit fullscreen
+        document.addEventListener('fullscreenchange', exitHandler);
+        document.addEventListener('webkitfullscreenchange', exitHandler);
+        document.addEventListener('mozfullscreenchange', exitHandler);
+        document.addEventListener('MSFullscreenChange', exitHandler);
+
+        function exitHandler() {
+            if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+                document.body.classList.remove('is-fullscreen');
+            }
+        }
+
+        // Initialize
+        updateFilters();
+
+    </script>
+</body>
+</html>
