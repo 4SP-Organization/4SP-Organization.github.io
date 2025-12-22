@@ -104,12 +104,33 @@
                         </div>
                         <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">LOGIN</button>
                     </form>
+                    
                     <div id="loginMessage" class="message-area w-full mt-4 text-center text-sm text-red-400"></div>
                     
+                    <div class="w-full max-w-md mt-4 text-center"> 
+                        <a id="forgotPasswordLink" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">Forgot Password?</a> 
+                    </div>
+
                     <p class="text-sm text-custom-light-gray mt-6 text-center w-full max-w-md">
                         Don't have an account? 
                         <a href="authentication.html" class="text-white hover:text-gray-300 font-normal transition">Sign up here</a>
                     </p>
+                </div>
+
+                <div id="resetPasswordContainer" class="w-full flex-col items-center hidden">
+                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Reset Your Password</h2>
+                    <p class="text-custom-light-gray text-base mb-6 text-center max-w-md font-normal">Enter your email address and we'll send you a link to reset your password.</p>
+                    <form id="resetPasswordForm" novalidate class="w-full max-w-md">
+                        <div class="mb-5">
+                            <label for="resetEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
+                            <input type="email" id="resetEmail" placeholder="Enter your registered email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
+                        </div>
+                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">SEND RESET LINK</button>
+                    </form>
+                    <div id="resetMessage" class="message-area w-full max-w-md mt-4 text-center text-sm"></div>
+                    <div class="w-full max-w-md mt-6 text-center"> 
+                        <a id="backToLoginLink" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">&larr; Back to Login</a> 
+                    </div>
                 </div>
 
                 <div id="auth-code-container" class="w-full flex-col items-center hidden">
@@ -210,6 +231,9 @@
             onAuthStateChanged,
             signOut,
             signInWithEmailAndPassword,
+            sendPasswordResetEmail,
+            sendEmailVerification,
+            fetchSignInMethodsForEmail,
             GoogleAuthProvider,
             GithubAuthProvider,
             TwitterAuthProvider,
@@ -250,6 +274,7 @@
         const unauthSocialContainer = document.getElementById('unauth-social-container');
         const authCodeContainer = document.getElementById('auth-code-container');
         const authInfoContainer = document.getElementById('auth-info-container');
+        const resetPasswordContainer = document.getElementById('resetPasswordContainer');
 
         const userEmailSpan = document.getElementById('userEmail');
         const generateBtn = document.getElementById('generateBtn');
@@ -259,7 +284,12 @@
         const copyBtn = document.getElementById('copyBtn');
         const messageArea = document.getElementById('messageArea');
         const logoutBtn = document.getElementById('logoutBtn');
+        
         const loginMessage = document.getElementById('loginMessage');
+        const resetMessage = document.getElementById('resetMessage');
+        
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const backToLoginLink = document.getElementById('backToLoginLink');
 
         const INDIGO_CLASSES = "text-indigo-500 bg-indigo-500/10 border-indigo-500 hover:bg-indigo-500/20";
         const CYAN_CLASSES = "text-cyan-500 bg-cyan-500/10 border-cyan-500 hover:bg-cyan-500/20";
@@ -267,21 +297,68 @@
         // Variable to hold the unsubscribe function for the listener
         let unsubscribeCodeListener = null;
 
+        // --- Toggle Views ---
+        forgotPasswordLink.addEventListener('click', () => {
+            unauthLoginContainer.classList.add('hidden');
+            unauthLoginContainer.classList.remove('flex'); // Remove flex so it hides properly
+            
+            resetPasswordContainer.classList.remove('hidden');
+            resetPasswordContainer.style.display = 'flex'; // Use flex for layout
+            resetMessage.innerText = ''; // Clear old messages
+        });
+
+        backToLoginLink.addEventListener('click', () => {
+            resetPasswordContainer.classList.add('hidden');
+            resetPasswordContainer.style.display = 'none';
+            
+            unauthLoginContainer.classList.remove('hidden');
+            unauthLoginContainer.style.display = 'flex';
+            loginMessage.innerText = ''; // Clear old messages
+        });
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // LOGGED IN
+                // VERIFICATION CHECK
+                // Social logins usually have emailVerified: true. Password logins need verification.
+                if (!user.emailVerified) {
+                    console.log("User logged in but not verified. Signing out.");
+                    await signOut(auth);
+                    
+                    // Show error (After signOut, user is null, so UI resets to unauth. We manually set the message here)
+                    loginMessage.innerHTML = 'Your email is not verified. Please check your inbox. <a href="#" id="resend-link" class="underline cursor-pointer hover:text-white">Resend email</a>';
+                    loginMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
+                    
+                    document.getElementById('resend-link')?.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        try {
+                            // We can't send verification if signed out. We need to catch this during login usually.
+                            // However, we still have the 'user' object from the callback scope before signout.
+                            // But Firebase might block the action if the token is revoked. 
+                            // Strategy: The user object is still valid in memory.
+                            await sendEmailVerification(user); 
+                            loginMessage.innerHTML = 'Verification email sent!';
+                            loginMessage.className = "message-area w-full mt-4 text-center text-sm success-message";
+                        } catch (err) {
+                            loginMessage.innerText = "Error sending email. Please log in again.";
+                        }
+                    });
+                    return; 
+                }
+
+                // LOGGED IN & VERIFIED
                 unauthLoginContainer.classList.add('hidden');
                 unauthSocialContainer.classList.add('hidden');
+                resetPasswordContainer.classList.add('hidden'); // Ensure reset is hidden
                 
                 authCodeContainer.classList.remove('hidden');
-                authCodeContainer.style.display = 'flex'; // Sets inline flex, which must be cleared on logout
+                authCodeContainer.style.display = 'flex'; 
                 authInfoContainer.classList.remove('hidden');
                 
                 userEmailSpan.textContent = user.email;
 
                 // Set up Real-time Listener for the user's access code
                 if (unsubscribeCodeListener) {
-                    unsubscribeCodeListener(); // Prevent duplicate listeners
+                    unsubscribeCodeListener(); 
                 }
 
                 try {
@@ -292,15 +369,12 @@
                     );
 
                     unsubscribeCodeListener = onSnapshot(q, (snapshot) => {
-                        // Safety Check: If logged out, stop immediately.
-                        if (!auth.currentUser) return;
+                        if (!auth.currentUser) return; // Safety
 
                         if (!snapshot.empty) {
-                            // Code Exists - Render it
                             const docSnapshot = snapshot.docs[0];
                             renderCodeState(docSnapshot);
                         } else {
-                            // No Code Found - Reset UI
                             renderNoCodeState();
                         }
                     }, (error) => {
@@ -314,13 +388,15 @@
             } else {
                 // LOGGED OUT
                 unauthLoginContainer.classList.remove('hidden');
+                unauthLoginContainer.style.display = 'flex'; // Ensure flex
+                
                 unauthSocialContainer.classList.remove('hidden');
                 
-                // IMPORTANT FIX: Explicitly set display to none to override any inline 'flex' styles
                 authCodeContainer.style.display = 'none';
                 authCodeContainer.classList.add('hidden');
                 
                 authInfoContainer.classList.add('hidden');
+                resetPasswordContainer.classList.add('hidden');
                 
                 // Reset internal parts
                 resultContainer.style.display = 'none';
@@ -341,16 +417,57 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
-            loginMessage.innerText = ""; // Clear previous errors
+            loginMessage.innerText = ""; 
+            loginMessage.className = "message-area w-full mt-4 text-center text-sm text-red-400"; // Reset style
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // State change handled by onAuthStateChanged
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Explicit Check for Verification immediately after login
+                if (!user.emailVerified) {
+                    // Force sign out handled in onAuthStateChanged, 
+                    // BUT we can set a specific message here to be sure.
+                    // (onAuthStateChanged handles the heavy lifting)
+                }
             } catch (error) {
                 let msg = 'Invalid email or password.';
                 if (error.code === 'auth/too-many-requests') msg = 'Access temporarily disabled due to too many failed login attempts.';
                 else if (error.code === 'auth/user-disabled') msg = 'Your account has been disabled.';
                 loginMessage.innerText = msg;
+            }
+        });
+
+        // --- Password Reset Handler ---
+        document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value.trim();
+            resetMessage.innerText = "";
+            resetMessage.className = "message-area w-full max-w-md mt-4 text-center text-sm";
+
+            if (!email) { 
+                resetMessage.innerText = 'Please enter your email.'; 
+                resetMessage.classList.add('error-message');
+                return; 
+            }
+
+            try {
+                const methods = await fetchSignInMethodsForEmail(auth, email);
+                if (methods.length === 0) {
+                    resetMessage.innerText = 'No account found with this email.';
+                    resetMessage.classList.add('error-message');
+                } else if (methods.some(m => m !== 'password')) {
+                    resetMessage.innerText = 'This account uses a social provider (Google/Microsoft/etc) and does not have a password to reset.';
+                    resetMessage.classList.add('warning-message');
+                } else {
+                    await sendPasswordResetEmail(auth, email);
+                    resetMessage.innerText = 'Password reset link sent! Check your inbox.';
+                    resetMessage.classList.add('success-message');
+                }
+            } catch (error) {
+                console.error(error);
+                resetMessage.innerText = 'An error occurred. Please check the email and try again.';
+                resetMessage.classList.add('error-message');
             }
         });
 
@@ -364,20 +481,16 @@
             resultContainer.classList.remove('hidden');
             resultContainer.style.display = 'flex';
             
-            // Check 'claimed' status
             if (docData.claimed === true) {
                 codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
                 messageArea.innerHTML = "This code is currently in use on your local client.";
                 messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
             } else {
                 codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                
-                // Added Download Link here
                 messageArea.innerHTML = `Code generated. Enter it in your 4SP Local Client. <a href="../4simpleproblems_v5.html" download="4simpleproblems_v5.html" class="text-cyan-500 hover:underline cursor-pointer ml-1" title="Download 4SP Client">Download Here</a>`;
                 messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
             }
             
-            // Set Regenerate Style (Outline added via classes)
             generateBtn.innerText = "Regenerate Code";
             generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-cyan-500 transition mb-6 ${CYAN_CLASSES}`;
             generateBtn.disabled = false;
@@ -389,7 +502,7 @@
             generateBtn.innerText = "Generate Code";
             generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-indigo-500 transition mb-6 ${INDIGO_CLASSES}`;
             resultContainer.classList.add('hidden');
-            resultContainer.style.display = 'none'; // Ensure it's hidden cleanly
+            resultContainer.style.display = 'none'; 
             generateBtn.classList.remove('hidden');
             generateBtn.disabled = false;
             messageArea.innerText = "";
