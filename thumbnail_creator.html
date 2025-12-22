@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4SP Thumbnail Creator</title>
+    <title>4SP Thumbnail Creator V2</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +16,7 @@
         :root {
             --menu-bg: #000000;
             --menu-border: #333;
+            --highlight: #8b5cf6;
         }
 
         body { 
@@ -29,107 +30,36 @@
             overflow: hidden;
         }
 
-        /* Control Panel Styling */
+        /* --- CONTROL PANEL --- */
         #controls-panel {
-            width: 320px;
+            width: 340px;
             background-color: #0d0d0d;
             border-right: 1px solid #1a1a1a;
-            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
             overflow-y: auto;
             z-index: 50;
+            flex-shrink: 0;
         }
 
-        /* The Main Stage */
-        #stage-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
-            background-size: 20px 20px;
-            position: relative;
-            padding: 2rem;
+        .panel-section {
+            padding: 1.25rem;
+            border-bottom: 1px solid #1a1a1a;
         }
 
-        /* The 16:9 Thumbnail Frame */
-        #thumbnail-frame {
-            width: 100%;
-            max-width: 1280px; /* Base editing size */
-            aspect-ratio: 16 / 9;
-            background-color: #000;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-        }
+        /* Inputs */
+        .control-group { margin-bottom: 1rem; }
+        .control-group:last-child { margin-bottom: 0; }
 
-        /* Background Image Layer */
-        #bg-layer {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.05); /* Slight scale to prevent blur edges */
-            z-index: 0;
-            transition: filter 0.2s ease;
-        }
-
-        /* Content Overlay Layer */
-        #content-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 10;
-            pointer-events: none; /* Let clicks pass through if needed */
-        }
-
-        /* Title Styling */
-        #thumb-title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            /* Width from left edge to middle */
-            width: 50%; 
-            height: 100%;
-            /* Specific padding to not touch edges */
-            padding: 4rem; 
-            box-sizing: border-box;
-            
-            /* Text setup */
-            color: white;
-            font-family: 'Geist', sans-serif;
-            font-weight: 700;
-            font-size: 4rem; 
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            display: flex;
-            align-items: flex-start; /* Align to top */
-            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            overflow-wrap: break-word;
-        }
-
-        /* Logo Styling */
-        #thumb-logo {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 3rem 4rem; /* Top/Right padding */
-            width: 120px; /* Adjust based on logo needs */
-            height: auto;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-        }
-
-        /* Inputs Styling */
         .control-group label {
-            display: block;
+            display: flex;
+            justify-content: space-between;
             font-size: 0.75rem;
-            color: #6b7280;
+            color: #9ca3af;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            font-weight: 500;
         }
 
         .input-dark {
@@ -140,20 +70,126 @@
             padding: 0.5rem;
             border-radius: 0.5rem;
             font-family: 'Geist', sans-serif;
-            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
-        .input-dark:focus {
-            outline: none;
-            border-color: #8b5cf6;
-        }
+        .input-dark:focus { outline: none; border-color: var(--highlight); }
 
         input[type=range] {
             width: 100%;
-            accent-color: #8b5cf6;
+            accent-color: var(--highlight);
             background: transparent;
+            cursor: pointer;
         }
 
-        /* Button Styling */
+        /* Collapsible Details (Custom Dropdown) */
+        details {
+            background: #151515;
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        details summary {
+            padding: 0.75rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e5e7eb;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+        }
+        
+        details summary::-webkit-details-marker { display: none; }
+        
+        details summary::after {
+            content: '+'; 
+            font-weight: bold;
+        }
+        details[open] summary::after { content: '-'; }
+
+        .details-content {
+            padding: 1rem;
+            background: #0a0a0a;
+            border-top: 1px solid #333;
+        }
+
+        /* --- STAGE --- */
+        #stage-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 2rem;
+            background-color: #000;
+        }
+
+        /* 16:9 Frame */
+        #thumbnail-frame {
+            width: 100%;
+            max-width: 1280px; 
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            user-select: none;
+        }
+
+        /* Background Layer (Full Bleed) */
+        #bg-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.02); 
+            z-index: 0;
+        }
+
+        /* Safe Area (Handles Padding) */
+        #safe-area {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            /* Padding is set via JS */
+            padding: 4rem; 
+            box-sizing: border-box; 
+        }
+
+        /* Title */
+        #thumb-title {
+            width: 55%; 
+            height: 100%;
+            color: white;
+            font-family: 'Geist', sans-serif;
+            margin: 0;
+            /* Typography set via JS */
+            font-weight: 700;
+            font-size: 4.5rem; 
+            line-height: 1;
+            letter-spacing: -0.03em;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+            overflow-wrap: break-word;
+        }
+
+        /* Logo */
+        #thumb-logo {
+            position: absolute;
+            top: 0;
+            right: 0;
+            /* Instead of padding on the image, we rely on the safe-area container */
+            width: 120px; 
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        /* --- UTILS --- */
         .btn-action {
             background: white;
             color: black;
@@ -163,15 +199,15 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: opacity 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            transition: 0.2s;
         }
         .btn-action:hover { opacity: 0.9; }
 
-        /* Fullscreen Helper Class */
+        /* Fullscreen Mode */
         body.is-fullscreen #controls-panel { display: none; }
         body.is-fullscreen #stage-container { padding: 0; background: black; }
         body.is-fullscreen #thumbnail-frame { 
@@ -181,48 +217,76 @@
             border: none; 
             box-shadow: none;
         }
-        
-        /* Adjust font size for different viewports dynamically via JS, but base CSS here */
-        @media (max-width: 1000px) {
-            #controls-panel { display: none; } /* Hide controls on mobile */
-        }
     </style>
 </head>
 <body>
 
     <div class="flex h-screen w-full">
         <aside id="controls-panel">
-            <div class="mb-4 pb-4 border-b border-[#1a1a1a]">
-                <h2 class="text-white font-bold text-xl mb-1">4SP Thumbnailer</h2>
-                <p class="text-xs text-gray-500">Create standard assets</p>
+            <div class="panel-section bg-[#0a0a0a]">
+                <h2 class="text-white font-bold text-lg">4SP Thumbnail Creator</h2>
             </div>
 
-            <div class="control-group">
-                <label>Video Title</label>
-                <textarea id="input-title" rows="3" class="input-dark" placeholder="Enter title here...">The Rapid Evolution of 4SP</textarea>
+            <div class="panel-section">
+                <div class="control-group">
+                    <label>Video Title</label>
+                    <textarea id="input-title" rows="3" class="input-dark">The Rapid Evolution of 4SP</textarea>
+                </div>
+                
+                <div class="control-group">
+                    <details>
+                        <summary>Typography & Effects</summary>
+                        <div class="details-content">
+                            <div class="control-group">
+                                <label>Font Weight: <span id="val-weight">700</span></label>
+                                <input type="range" id="range-weight" min="100" max="900" step="100" value="700">
+                            </div>
+                            <div class="control-group">
+                                <label>Font Size: <span id="val-size">4.5rem</span></label>
+                                <input type="range" id="range-size" min="2" max="8" step="0.1" value="4.5">
+                            </div>
+                            <div class="control-group">
+                                <label>Shadow Opacity: <span id="val-shadow-op">80%</span></label>
+                                <input type="range" id="range-shadow-op" min="0" max="1" step="0.1" value="0.8">
+                            </div>
+                            <div class="control-group">
+                                <label>Shadow Blur: <span id="val-shadow-blur">12px</span></label>
+                                <input type="range" id="range-shadow-blur" min="0" max="50" step="1" value="12">
+                            </div>
+                        </div>
+                    </details>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Background Image</label>
-                <input type="file" id="input-file" accept="image/*" class="text-xs text-gray-400 mb-2">
-                <input type="text" id="input-bg-url" class="input-dark" placeholder="Or paste Image URL...">
+            <div class="panel-section">
+                <div class="control-group">
+                    <label>Global Padding: <span id="val-padding">64px</span></label>
+                    <input type="range" id="range-padding" min="0" max="150" step="4" value="64">
+                    <p class="text-[10px] text-gray-500 mt-1">Adjusts spacing from edges for Logo & Title.</p>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Blur Intensity: <span id="val-blur">0px</span></label>
-                <input type="range" id="range-blur" min="0" max="20" value="0" step="0.5">
+            <div class="panel-section">
+                <div class="control-group">
+                    <label>Background Image</label>
+                    <input type="file" id="input-file" accept="image/*" class="text-xs text-gray-400 mb-2 w-full">
+                    <input type="text" id="input-bg-url" class="input-dark text-xs" placeholder="Or paste Image URL...">
+                </div>
+                <div class="control-group">
+                    <label>Blur: <span id="val-blur">0px</span></label>
+                    <input type="range" id="range-blur" min="0" max="20" value="0" step="0.5">
+                </div>
+                <div class="control-group">
+                    <label>Brightness: <span id="val-bright">50%</span></label>
+                    <input type="range" id="range-bright" min="0" max="100" value="50">
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Brightness: <span id="val-bright">50%</span></label>
-                <input type="range" id="range-bright" min="0" max="100" value="50">
-            </div>
-
-            <div class="mt-auto pt-4 border-t border-[#1a1a1a]">
+            <div class="mt-auto panel-section bg-[#0a0a0a]">
                 <button id="btn-fullscreen" class="btn-action">
                     <i class="fa-solid fa-expand"></i> Enter Fullscreen
                 </button>
-                <p class="text-xs text-center text-gray-600 mt-2">Press 'Esc' to exit fullscreen</p>
+                <p class="text-xs text-center text-gray-600 mt-2">Screenshot in Fullscreen (Esc to exit)</p>
             </div>
         </aside>
 
@@ -230,10 +294,10 @@
             <div id="thumbnail-frame">
                 <img id="bg-layer" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop" alt="Background">
                 
-                <div id="content-layer">
+                <div id="safe-area">
                     <h1 id="thumb-title">The Rapid Evolution of 4SP</h1>
                     
-                    <img id="thumb-logo" src="/images/logo.png" onerror="this.src='https://placehold.co/200x200/black/white?text=4SP'" alt="4SP Logo">
+                    <img id="thumb-logo" src="../images/logo.png" onerror="this.style.opacity='0.5'; this.title='Logo not found at ../images/logo.png'" alt="4SP Logo">
                 </div>
             </div>
         </main>
@@ -241,97 +305,105 @@
 
     <script>
         // --- ELEMENTS ---
-        const inputTitle = document.getElementById('input-title');
-        const inputBgUrl = document.getElementById('input-bg-url');
-        const inputFile = document.getElementById('input-file');
-        const rangeBlur = document.getElementById('range-blur');
-        const rangeBright = document.getElementById('range-bright');
-        const btnFullscreen = document.getElementById('btn-fullscreen');
-        
-        // Display Elements
-        const thumbTitle = document.getElementById('thumb-title');
-        const bgLayer = document.getElementById('bg-layer');
-        const thumbnailFrame = document.getElementById('thumbnail-frame');
+        const els = {
+            inputTitle: document.getElementById('input-title'),
+            inputBgUrl: document.getElementById('input-bg-url'),
+            inputFile: document.getElementById('input-file'),
+            
+            // Sliders
+            rangeBlur: document.getElementById('range-blur'),
+            rangeBright: document.getElementById('range-bright'),
+            rangePadding: document.getElementById('range-padding'),
+            rangeWeight: document.getElementById('range-weight'),
+            rangeSize: document.getElementById('range-size'),
+            rangeShadowOp: document.getElementById('range-shadow-op'),
+            rangeShadowBlur: document.getElementById('range-shadow-blur'),
 
-        // Value Displays
-        const valBlur = document.getElementById('val-blur');
-        const valBright = document.getElementById('val-bright');
+            // Value Labels
+            valBlur: document.getElementById('val-blur'),
+            valBright: document.getElementById('val-bright'),
+            valPadding: document.getElementById('val-padding'),
+            valWeight: document.getElementById('val-weight'),
+            valSize: document.getElementById('val-size'),
+            valShadowOp: document.getElementById('val-shadow-op'),
+            valShadowBlur: document.getElementById('val-shadow-blur'),
 
-        // --- STATE & UPDATES ---
-        
-        function updateFilters() {
-            const blur = rangeBlur.value;
-            const bright = rangeBright.value; // Map slider 0-100 to brightness 0.1-1.5 roughly
-            
-            // Mapping brightness: 50 is "normal" (100%), 0 is black, 100 is brighter
-            // Let's make the range intuitive: 0% is dark, 100% is normal source brightness? 
-            // Actually usually for backgrounds we want to darken them. 
-            // Let's assume the slider is direct Brightness %.
-            
-            bgLayer.style.filter = `blur(${blur}px) brightness(${bright}%)`;
-            
-            valBlur.innerText = `${blur}px`;
-            valBright.innerText = `${bright}%`;
+            // Stage Elements
+            thumbTitle: document.getElementById('thumb-title'),
+            bgLayer: document.getElementById('bg-layer'),
+            safeArea: document.getElementById('safe-area'),
+            btnFullscreen: document.getElementById('btn-fullscreen')
+        };
+
+        // --- UPDATE FUNCTIONS ---
+
+        function updateVisuals() {
+            // Background Filters
+            const blur = els.rangeBlur.value;
+            const bright = els.rangeBright.value;
+            els.bgLayer.style.filter = `blur(${blur}px) brightness(${bright}%)`;
+            els.valBlur.innerText = `${blur}px`;
+            els.valBright.innerText = `${bright}%`;
+
+            // Global Padding
+            const pad = els.rangePadding.value;
+            els.safeArea.style.padding = `${pad}px`;
+            els.valPadding.innerText = `${pad}px`;
+
+            // Typography
+            const weight = els.rangeWeight.value;
+            const size = els.rangeSize.value;
+            els.thumbTitle.style.fontWeight = weight;
+            els.thumbTitle.style.fontSize = `${size}rem`;
+            els.valWeight.innerText = weight;
+            els.valSize.innerText = `${size}rem`;
+
+            // Shadow
+            const sOp = els.rangeShadowOp.value;
+            const sBlur = els.rangeShadowBlur.value;
+            els.thumbTitle.style.textShadow = `0 4px ${sBlur}px rgba(0,0,0,${sOp})`;
+            els.valShadowOp.innerText = `${Math.round(sOp * 100)}%`;
+            els.valShadowBlur.innerText = `${sBlur}px`;
         }
 
-        // Event Listeners
-        inputTitle.addEventListener('input', (e) => {
-            thumbTitle.innerText = e.target.value;
-        });
+        // --- LISTENERS ---
 
-        // Background URL
-        inputBgUrl.addEventListener('input', (e) => {
-            if(e.target.value) bgLayer.src = e.target.value;
-        });
+        // Text Input
+        els.inputTitle.addEventListener('input', (e) => els.thumbTitle.innerText = e.target.value);
 
-        // Background File Upload
-        inputFile.addEventListener('change', (e) => {
+        // Background Image Handling
+        els.inputBgUrl.addEventListener('input', (e) => { if(e.target.value) els.bgLayer.src = e.target.value; });
+        els.inputFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    bgLayer.src = event.target.result;
-                }
+                reader.onload = (ev) => els.bgLayer.src = ev.target.result;
                 reader.readAsDataURL(file);
             }
         });
 
-        rangeBlur.addEventListener('input', updateFilters);
-        rangeBright.addEventListener('input', updateFilters);
+        // Attach listeners to all range inputs
+        const ranges = [
+            els.rangeBlur, els.rangeBright, els.rangePadding, 
+            els.rangeWeight, els.rangeSize, els.rangeShadowOp, els.rangeShadowBlur
+        ];
+        ranges.forEach(range => range.addEventListener('input', updateVisuals));
 
         // --- FULLSCREEN LOGIC ---
-        
-        btnFullscreen.addEventListener('click', () => {
-            const elem = document.documentElement; // Make the whole page fullscreen
-            
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) { /* Safari */
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) { /* IE11 */
-                elem.msRequestFullscreen();
-            }
-
+        els.btnFullscreen.addEventListener('click', () => {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
             document.body.classList.add('is-fullscreen');
-            
-            // When in fullscreen, we might want to scale the font up if the screen is massive
-            // For now, viewport units (vw) or just high-res screenshotting works best.
         });
 
-        // Listen for exit fullscreen
-        document.addEventListener('fullscreenchange', exitHandler);
-        document.addEventListener('webkitfullscreenchange', exitHandler);
-        document.addEventListener('mozfullscreenchange', exitHandler);
-        document.addEventListener('MSFullscreenChange', exitHandler);
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) document.body.classList.remove('is-fullscreen');
+        });
 
-        function exitHandler() {
-            if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
-                document.body.classList.remove('is-fullscreen');
-            }
-        }
-
-        // Initialize
-        updateFilters();
+        // Init
+        updateVisuals();
 
     </script>
 </body>
