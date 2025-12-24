@@ -62,6 +62,27 @@
             border-color: rgba(192, 132, 252, 1);
         }
 
+        /* --- CREATE LINK BUTTON (Orange) --- */
+        .hero-create-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #ffffff;
+            background-color: rgba(249, 115, 22, 0.1); 
+            border: 1px solid rgba(253, 186, 116, 0.5); 
+            border-radius: 14px; 
+            text-decoration: none;
+            transition: all 0.2s ease;
+            margin-left: 1rem;
+        }
+        .hero-create-btn:hover {
+            background-color: rgba(253, 186, 116, 0.2);
+            border-color: rgba(253, 186, 116, 1);
+        }
+
         /* --- CONTENT BOXES (Matte style like notes editor) --- */
         .content-box {
             background-color: #0d0d0d; /* Matches editor bg */
@@ -125,6 +146,10 @@
                 <i class="fa-solid fa-book-open w-4"></i>
                 Summary
             </button>
+            <a href="create_link.html" class="btn-toolbar-style ml-2" title="Create your own 4SP link">
+                <i class="fa-solid fa-link w-4"></i>
+                Create Link
+            </a>
             <a id="redirect-button" href="../connection.html" target="_blank" class="btn-toolbar-style ml-2" title="Connect to 4SP Local">
                 <i class="fa-solid fa-rocket w-4"></i>
                 Connect
@@ -144,9 +169,12 @@
                 <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-8 font-light">
                     This is the official organizational home for <strong class="text-white">4simpleproblems (4SP)</strong>. <strong class="text-purple-400">Version 5 DV (Downloadable Version)</strong> is now near completion, offering unblockable access, full local security, and no external dependencies.
                 </p>
-                <div class="mb-6">
+                <div class="mb-6 flex justify-center items-center">
                     <a id="hero-redirect-button" href="../connection.html" target="_blank" class="hero-connect-btn">
                         Connect to 4SP <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                    <a href="create_link.html" class="hero-create-btn">
+                        Create a Link <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
                 <div class="text-center mt-6 text-gray-600">
