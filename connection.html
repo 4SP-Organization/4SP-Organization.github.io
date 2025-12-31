@@ -195,6 +195,15 @@
                             </button>
                         </div>
                         <div id="messageArea" class="message-area mt-4 text-center text-sm"></div>
+
+                        <div class="w-full mt-6 text-center border-t border-custom-medium-gray/30 pt-4">
+                            <p class="text-custom-light-gray text-sm font-light">
+                                Need the client? 
+                                <a href="../4simpleproblems_v5_latest.html" download="4simpleproblems_v5_latest.html" class="text-cyan-500 hover:text-cyan-400 transition hover:underline cursor-pointer ml-1" title="Download 4SP Client">
+                                    Download Here
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -557,7 +566,8 @@
                 messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
             } else {
                 codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                messageArea.innerHTML = `Code generated. Enter it in your 4SP Local Client. <a href="../4simpleproblems_v5_latest.html" download="4simpleproblems_v5_latest.html" class="text-cyan-500 hover:underline cursor-pointer ml-1" title="Download 4SP Client">Download Here</a>`;
+                // UPDATED: No longer injecting the download link here. It is static in HTML now.
+                messageArea.innerHTML = "Code generated. Enter it in your 4SP Local Client.";
                 messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
             }
             
