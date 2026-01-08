@@ -493,5 +493,40 @@
             });
         })();
     </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const allowedAdmins = ['4simpleproblems@gmail.com', 'belkwy30@minerva.sparcc.org'];
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && allowedAdmins.includes(user.email)) {
+                const createBtn = document.querySelector('.hero-create-btn');
+                if (createBtn) {
+                    const analyticsBtn = document.createElement('a');
+                    analyticsBtn.href = 'analytics.html';
+                    analyticsBtn.className = 'hero-create-btn'; 
+                    analyticsBtn.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                    analyticsBtn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+                    analyticsBtn.style.color = '#60a5fa'; // lighter blue text
+                    analyticsBtn.innerHTML = 'View Analytics <i class="fas fa-chart-line ml-2"></i>';
+                    
+                    analyticsBtn.onmouseover = () => {
+                        analyticsBtn.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                        analyticsBtn.style.borderColor = '#3b82f6';
+                    };
+                    analyticsBtn.onmouseout = () => {
+                        analyticsBtn.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                        analyticsBtn.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+                    };
+
+                    createBtn.parentNode.insertBefore(analyticsBtn, createBtn.nextSibling);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
