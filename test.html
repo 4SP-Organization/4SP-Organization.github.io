@@ -148,7 +148,7 @@
         .cf-ver-btn {
             font-size: 0.85rem;
             padding: 0.4rem 1rem;
-            border-radius: 6px;
+            border-radius: 10px; /* UPDATED: More rounded */
             border: 1px solid #374151;
             color: #9ca3af;
             background: transparent;
@@ -249,7 +249,7 @@
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 6: Get Authorized</h3>
                         <p class="text-gray-400 font-light mb-2">
-                            DM your link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-blue-400 hover:underline">4SP on Discord</a>.
+                            DM your link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-blue-400 underline hover:text-blue-300">4SP on Discord</a>.
                         </p>
                     </div>
                 </div>
@@ -279,7 +279,7 @@
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 4: Authorize</h3>
                         <p class="text-gray-400 font-light mb-2">
-                            Send your <code>username.github.io</code> link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-purple-400 hover:underline">4SP on Discord</a>.
+                            Send your <code>username.github.io</code> link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-purple-400 underline hover:text-purple-300">4SP on Discord</a>.
                         </p>
                     </div>
                 </div>
@@ -382,7 +382,7 @@
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 4: Authorize</h3>
                         <p class="text-gray-400 font-light mb-2">
-                            Copy your final Cloudflare URL and send it to the <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-orange-400 hover:underline">4SP Discord account</a> to be authorized.
+                            Copy your final Cloudflare URL and send it to the <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-orange-400 underline hover:text-orange-300">4SP Discord account</a> to be authorized.
                         </p>
                     </div>
                 </div>
@@ -403,12 +403,12 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 2: Import Code</h3>
-                        <p class="text-gray-400 font-light mb-2">Import the code from the <a href="https://github.com/4simpleproblems" target="_blank" class="text-white hover:underline">4SP GitHub Organization</a> repositories.</p>
+                        <p class="text-gray-400 font-light mb-2">Import the code from the <a href="https://github.com/4simpleproblems-v5/" target="_blank" class="text-white hover:underline">4SP's Github</a> repositories.</p>
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 3: Deploy</h3>
                         <p class="text-gray-400 font-light mb-2">
-                            Name your project and click <strong>Deploy</strong>. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-white hover:underline">4SP on Discord</a>.
+                            Name your project and click <strong>Deploy</strong>. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-white underline hover:text-gray-300">4SP on Discord</a>.
                         </p>
                     </div>
                 </div>
@@ -438,7 +438,7 @@
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 4: Activate</h3>
                         <p class="text-gray-400 font-light mb-2">
-                            Click Activate. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-red-400 hover:underline">4SP on Discord</a>.
+                            Click Activate. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-red-400 underline hover:text-red-300">4SP on Discord</a>.
                         </p>
                     </div>
                 </div>
@@ -476,7 +476,7 @@
     </footer>
 
     <script>
-        function switchTab(tabId) {
+        function switchTab(tabId, updateHash = true) {
             // Reset Buttons
             document.querySelectorAll('.custom-tab-btn').forEach(btn => btn.classList.remove('active'));
             // Hide Content
@@ -494,6 +494,18 @@
             else if (tabId === 'vercel') titleEl.classList.add('gradient-vercel');
             else if (tabId === 'fastly') titleEl.classList.add('gradient-fastly');
             else if (tabId === 'domain') titleEl.classList.add('gradient-domain');
+
+            // Set URL Hash without scrolling (unless it's initial load)
+            if (updateHash) {
+                // Using pushState prevents the default jump behavior if we want custom smooth scroll later, 
+                // but for now, simple hash setting is fine. 
+                // However, to prevent "jumping" if already there:
+                if (history.pushState) {
+                    history.pushState(null, null, '#' + tabId);
+                } else {
+                    window.location.hash = tabId;
+                }
+            }
         }
 
         // Copy Code Function for Cloudflare
@@ -563,24 +575,18 @@
 };`;
         }
 
-        // Check for Hash on Load to switch tabs
-        window.addEventListener('load', () => {
-            const hash = window.location.hash.substring(1); // Remove '#'
-            const validTabs = ['dynu', 'github', 'cloudflare', 'vercel', 'fastly', 'domain'];
-            
+        // Initialize on Load
+        const validTabs = ['dynu', 'github', 'cloudflare', 'vercel', 'fastly', 'domain'];
+
+        function handleHash() {
+            const hash = window.location.hash.substring(1);
             if (hash && validTabs.includes(hash)) {
-                switchTab(hash);
+                switchTab(hash, false); // Don't pushState if we are just loading from hash
             }
-        });
-        
-        // Listen for hash changes if user clicks back/forward
-        window.addEventListener('hashchange', () => {
-             const hash = window.location.hash.substring(1);
-             const validTabs = ['dynu', 'github', 'cloudflare', 'vercel', 'fastly', 'domain'];
-             if (hash && validTabs.includes(hash)) {
-                switchTab(hash);
-            }
-        });
+        }
+
+        window.addEventListener('load', handleHash);
+        window.addEventListener('hashchange', handleHash);
 
     </script>
 
