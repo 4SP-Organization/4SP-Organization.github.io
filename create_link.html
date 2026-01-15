@@ -143,6 +143,26 @@
         .code-function { color: #d2a8ff; } /* purple */
         .code-string { color: #a5d6ff; } /* blue */
         .code-comment { color: #8b949e; } /* gray */
+
+        /* Cloudflare Version Toggle Buttons */
+        .cf-ver-btn {
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border-radius: 10px; /* UPDATED: More rounded */
+            border: 1px solid #374151;
+            color: #9ca3af;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .cf-ver-btn:hover {
+            border-color: #f97316;
+            color: #fdba74;
+        }
+        .cf-ver-btn.active {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: #f97316;
+            color: #f97316;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col">
@@ -228,7 +248,9 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 6: Get Authorized</h3>
-                        <p class="text-gray-400 font-light mb-2">DM your link to 4SP on Discord.</p>
+                        <p class="text-gray-400 font-light mb-2">
+                            DM your link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-blue-400 underline hover:text-blue-300">4SP on Discord</a>.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -256,7 +278,9 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 4: Authorize</h3>
-                        <p class="text-gray-400 font-light mb-2">Send your <code>username.github.io</code> link to 4SP on Discord.</p>
+                        <p class="text-gray-400 font-light mb-2">
+                            Send your <code>username.github.io</code> link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-purple-400 underline hover:text-purple-300">4SP on Discord</a>.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -287,9 +311,14 @@
 
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 2: Edit Code</h3>
-                        <p class="text-gray-400 font-light mb-2">
-                            You are now on the Production page. Click <strong>Edit code</strong> and wait for the editor to load. Replace the existing code with the script below:
+                        <p class="text-gray-400 font-light mb-4">
+                            Select which version of 4SP you want to host, then replace your worker code with the script below.
                         </p>
+                        
+                        <div class="flex items-center gap-3 mb-2">
+                            <button onclick="setCloudflareVersion('std')" id="cf-ver-std" class="cf-ver-btn active">Host 4SP</button>
+                            <button onclick="setCloudflareVersion('max')" id="cf-ver-max" class="cf-ver-btn">Host 4SP MAX</button>
+                        </div>
 
                         <div class="terminal-window">
                             <div class="terminal-header">
@@ -353,7 +382,7 @@
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 4: Authorize</h3>
                         <p class="text-gray-400 font-light mb-2">
-                            Copy your final Cloudflare URL and send it to the 4SP Discord account to be authorized.
+                            Copy your final Cloudflare URL and send it to the <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-orange-400 underline hover:text-orange-300">4SP Discord account</a> to be authorized.
                         </p>
                     </div>
                 </div>
@@ -374,11 +403,13 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 2: Import Code</h3>
-                        <p class="text-gray-400 font-light mb-2">Import the code from the <a href="https://github.com/4simpleproblems" target="_blank" class="text-white hover:underline">4SP GitHub Organization</a> repositories.</p>
+                        <p class="text-gray-400 font-light mb-2">Import the code from the <a href="https://github.com/4simpleproblems-v5/" target="_blank" class="text-white hover:underline">4SP's Github</a> repositories.</p>
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 3: Deploy</h3>
-                        <p class="text-gray-400 font-light mb-2">Name your project and click <strong>Deploy</strong>. DM the URL to 4SP on Discord.</p>
+                        <p class="text-gray-400 font-light mb-2">
+                            Name your project and click <strong>Deploy</strong>. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-white underline hover:text-gray-300">4SP on Discord</a>.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -406,7 +437,9 @@
                     </div>
                     <div>
                         <h3 class="text-2xl font-light text-white mb-4">Step 4: Activate</h3>
-                        <p class="text-gray-400 font-light mb-2">Click Activate. DM the URL to 4SP on Discord.</p>
+                        <p class="text-gray-400 font-light mb-2">
+                            Click Activate. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-red-400 underline hover:text-red-300">4SP on Discord</a>.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -443,7 +476,7 @@
     </footer>
 
     <script>
-        function switchTab(tabId) {
+        function switchTab(tabId, updateHash = true) {
             // Reset Buttons
             document.querySelectorAll('.custom-tab-btn').forEach(btn => btn.classList.remove('active'));
             // Hide Content
@@ -461,6 +494,18 @@
             else if (tabId === 'vercel') titleEl.classList.add('gradient-vercel');
             else if (tabId === 'fastly') titleEl.classList.add('gradient-fastly');
             else if (tabId === 'domain') titleEl.classList.add('gradient-domain');
+
+            // Set URL Hash without scrolling (unless it's initial load)
+            if (updateHash) {
+                // Using pushState prevents the default jump behavior if we want custom smooth scroll later, 
+                // but for now, simple hash setting is fine. 
+                // However, to prevent "jumping" if already there:
+                if (history.pushState) {
+                    history.pushState(null, null, '#' + tabId);
+                } else {
+                    window.location.hash = tabId;
+                }
+            }
         }
 
         // Copy Code Function for Cloudflare
@@ -474,6 +519,75 @@
                 }, 2000);
             });
         }
+
+        // Cloudflare Version Switching
+        function setCloudflareVersion(version) {
+            const stdBtn = document.getElementById('cf-ver-std');
+            const maxBtn = document.getElementById('cf-ver-max');
+            const codeEl = document.getElementById('cf-code');
+
+            let targetHost = "4simpleproblems.kozow.com";
+
+            if (version === 'max') {
+                targetHost = "4sp-max.giize.com";
+                maxBtn.classList.add('active');
+                stdBtn.classList.remove('active');
+            } else {
+                stdBtn.classList.add('active');
+                maxBtn.classList.remove('active');
+            }
+
+            // Reconstruct code block with correct host and syntax highlighting
+            codeEl.innerHTML = `<span class="code-keyword">export default</span> {
+  <span class="code-keyword">async</span> <span class="code-function">fetch</span>(request, env, ctx) {
+    <span class="code-keyword">const</span> ORIGIN_HOST = <span class="code-string">"${targetHost}"</span>;
+
+    <span class="code-keyword">const</span> url = <span class="code-keyword">new</span> URL(request.url);
+
+    <span class="code-comment">// Build the origin URL with full path + query</span>
+    <span class="code-keyword">const</span> originUrl = <span class="code-keyword">new</span> URL(request.url);
+    originUrl.hostname = ORIGIN_HOST;
+    originUrl.protocol = <span class="code-string">"https:"</span>;
+
+    <span class="code-comment">// Forward request to origin</span>
+    <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> fetch(originUrl.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.method === <span class="code-string">"GET"</span> || request.method === <span class="code-string">"HEAD"</span>
+        ? <span class="code-keyword">null</span>
+        : request.body,
+      redirect: <span class="code-string">"manual"</span>,
+    });
+
+    <span class="code-comment">// Clone headers so we can safely modify them</span>
+    <span class="code-keyword">const</span> newHeaders = <span class="code-keyword">new</span> Headers(response.headers);
+
+    <span class="code-comment">// Optional but recommended</span>
+    newHeaders.set(<span class="code-string">"X-Proxied-By"</span>, <span class="code-string">"Cloudflare-Worker-4SP"</span>);
+    newHeaders.set(<span class="code-string">"Cache-Control"</span>, <span class="code-string">"public, max-age=600"</span>);
+
+    <span class="code-keyword">return new</span> Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: newHeaders,
+    });
+  }
+};`;
+        }
+
+        // Initialize on Load
+        const validTabs = ['dynu', 'github', 'cloudflare', 'vercel', 'fastly', 'domain'];
+
+        function handleHash() {
+            const hash = window.location.hash.substring(1);
+            if (hash && validTabs.includes(hash)) {
+                switchTab(hash, false); // Don't pushState if we are just loading from hash
+            }
+        }
+
+        window.addEventListener('load', handleHash);
+        window.addEventListener('hashchange', handleHash);
+
     </script>
 
 </body>
