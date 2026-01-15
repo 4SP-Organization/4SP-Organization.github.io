@@ -3,609 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4SP - CONNECT</title>
-    <meta name="description" content="Log into or create your 4SP account to access the student toolkit.">
+    <title>4SP - CREATE LINK</title>
+    <meta name="description" content="Guide to creating your own 4SP link using various hosting providers.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../navigation-mini.js"></script>
-
-    <script>
-        // Unified Tailwind CSS configuration for a consistent dark theme
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'custom-darkest-gray': '#040404', // Body background
-                        'custom-dark-gray': '#111111',    // Form container background
-                        'custom-medium-gray': '#252525', // Borders, inputs, buttons
-                        'custom-light-gray': '#505050',  // Labels and secondary text
-                        'custom-lighter-gray': '#808080', // Hover states and subtle text
-                        'custom-white-gray': '#c0c0c0',  // Main text and headings
-                    }
-                }
-            }
-        }
-    </script>
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="navbar.css">
+    <script src="navbar-loader.js" defer></script>
+
     <style>
+        html { scroll-behavior: smooth; }
         :root {
-            --geist-foreground: 192, 192, 192; /* custom-white-gray */
-            --geist-background: 7, 7, 7;       /* custom-darkest-gray */
+            --geist-foreground: 255, 255, 255;
+            --geist-background: 0, 0, 0;
         }
-
-        body {
-            font-family: 'Geist', sans-serif;
-            background-color: rgb(var(--geist-background));
-            color: rgb(var(--geist-foreground));
-            transition: all 0.3s ease;
-            font-weight: 300;
-        }
-
-        h1, h2, h3, .font-bold, .font-semibold, strong, .tracking-tighter {
-            font-weight: 400 !important;
-        }
-
-        .btn-social {
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .btn-social:hover {
-            background-color: rgba(37, 37, 37, 0.7);
-            border-color: #383838;
-        }
+        .dark { color-scheme: dark; }
+        body { font-family: 'Geist', sans-serif; padding-top: 4rem; }
         
-        .message-area { min-height: 20px; }
-        .error-message { color: #f87171; font-weight: 400; }
-        .success-message { color: #4ade80; font-weight: 400; }
-        .warning-message { color: #fbbf24; font-weight: 400; }
-        
-        .auth-split-container { max-width: 1200px; margin: 0 auto; min-height: 600px; }
-        @media (min-width: 768px) { .auth-col { } }
-        @media (max-width: 767px) {
-            .right-col { display: none; }
-            .left-col { border-right: none; }
+        /* Gradient Text Logic */
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(90deg, #3b82f6, #60a5fa); /* Default Blue */
+            transition: background-image 0.5s ease;
         }
 
-        .code-display {
-            font-family: monospace;
-            letter-spacing: 0.2em;
-            font-size: 1.5rem;
-            background: #000;
-            border: 1px solid #333;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            width: 100%;
-            text-align: center;
+        /* Gradient Variations */
+        .gradient-dynu { background-image: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .gradient-github { background-image: linear-gradient(90deg, #a855f7, #d946ef); }
+        .gradient-cloudflare { background-image: linear-gradient(90deg, #f97316, #fb923c); }
+        .gradient-vercel { background-image: linear-gradient(90deg, #ffffff, #9ca3af); }
+        .gradient-fastly { background-image: linear-gradient(90deg, #ef4444, #f87171); }
+        .gradient-domain { background-image: linear-gradient(90deg, #22c55e, #4ade80); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+
+        /* List Items */
+        .step-list-item {
+            position: relative;
+            padding-left: 1.5rem;
             margin-bottom: 0.5rem;
-            color: #fff;
+        }
+        .step-list-item::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #6b7280;
+        }
+
+        /* --- CUSTOM BUTTON STYLES --- */
+        .custom-tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Geist', sans-serif;
+        }
+        .custom-tab-btn:hover { background: rgba(255, 255, 255, 0.1); color: #e5e7eb; }
+
+        /* Active States */
+        #btn-dynu.active { color: #3b82f6; border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        #btn-github.active { color: #a855f7; border-color: #a855f7; background: rgba(168, 85, 247, 0.1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
+        #btn-cloudflare.active { color: #f97316; border-color: #f97316; background: rgba(249, 115, 22, 0.1); box-shadow: 0 0 15px rgba(249, 115, 22, 0.2); }
+        #btn-vercel.active { color: #ffffff; border-color: #ffffff; background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
+        #btn-fastly.active { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); }
+        #btn-domain.active { color: #22c55e; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
+        
+        /* Tab Content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- TERMINAL STYLE --- */
+        .terminal-window {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: 'Geist Mono', monospace;
+            margin-top: 1rem;
+        }
+        .terminal-header {
+            background-color: #161b22;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #30363d;
+        }
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red { background-color: #ff5f56; }
+        .dot-yellow { background-color: #ffbd2e; }
+        .dot-green { background-color: #27c93f; }
+        
+        .copy-btn {
+            font-size: 0.75rem;
+            color: #8b949e;
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .copy-btn:hover { color: #c9d1d9; }
+        
+        .terminal-body {
+            padding: 1rem;
+            overflow-x: auto;
+            color: #c9d1d9;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        /* Syntax highlighting simple override */
+        .code-keyword { color: #ff7b72; } /* red/pink */
+        .code-function { color: #d2a8ff; } /* purple */
+        .code-string { color: #a5d6ff; } /* blue */
+        .code-comment { color: #8b949e; } /* gray */
+
+        /* Cloudflare Version Toggle Buttons */
+        .cf-ver-btn {
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            border: 1px solid #374151;
+            color: #9ca3af;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .cf-ver-btn:hover {
+            border-color: #f97316;
+            color: #fdba74;
+        }
+        .cf-ver-btn.active {
+            background: rgba(249, 115, 22, 0.15);
+            border-color: #f97316;
+            color: #f97316;
         }
     </style>
 </head>
-<body class="bg-custom-darkest-gray text-custom-white-gray min-h-screen flex flex-col">
+<body class="bg-black text-white min-h-screen flex flex-col">
 
-    <main class="flex-grow flex items-stretch justify-center p-0">
-        <div class="auth-split-container bg-custom-darkest-gray flex flex-wrap w-full border-0 overflow-hidden p-0">
-            
-            <div class="auth-col left-col flex-1 p-8 flex flex-col justify-center items-center bg-custom-darkest-gray min-w-[300px] border-r border-custom-medium-gray/30">
+    <header class="org-navbar">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" id="logo-link" class="flex items-center space-x-2">
+                <img src="/images/logo.png" alt="4SP Logo" class="h-8 w-auto" id="navbar-logo">
+            </a>
+        </div>
+        
+        <nav class="flex items-center gap-2">
+            <a href="index.html" class="btn-toolbar-style" title="Home of 4SP">
+                <i class="fa-solid fa-home w-4"></i>
+                Home
+            </a>
+            <a href="legal.html" class="btn-toolbar-style" title="Read the Terms of Services">
+                <i class="fa-solid fa-gavel w-4"></i>
+                Legal
+            </a>
+            <a href="connection.html" class="btn-toolbar-style ml-2" title="Connect to 4SP Local">
+                <i class="fa-solid fa-download w-4"></i>
+                Download
+            </a>
+        </nav>
+    </header>
 
-                <div id="unauth-login-container" class="w-full flex flex-col items-center">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Login to Generate Code</h2>
-                    <form id="loginForm" class="w-full max-w-md"> 
-                        <div class="mb-5">
-                            <label for="loginEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
-                            <input type="email" id="loginEmail" placeholder="Enter your email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
-                        </div>
-                        <div class="mb-5">
-                            <label for="loginPassword" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Password</label>
-                            <input type="password" id="loginPassword" placeholder="Enter your password" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
-                        </div>
-                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">LOGIN</button>
-                    </form>
-                    
-                    <div id="loginMessage" class="message-area w-full mt-4 text-center text-sm text-red-400"></div>
-                    
-                    <div class="w-full max-w-md mt-4 text-center"> 
-                        <a id="forgotPasswordLink" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">Forgot Password?</a> 
-                    </div>
-
-                    <p class="text-sm text-custom-light-gray mt-6 text-center w-full max-w-md">
-                        Don't have an account? 
-                        <a id="goToSignupLink" class="text-white hover:text-gray-300 font-normal cursor-pointer transition">Sign up here</a>
-                    </p>
-                </div>
-
-                <div id="resetPasswordContainer" class="w-full flex-col items-center hidden">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Reset Your Password</h2>
-                    <p class="text-custom-light-gray text-base mb-6 text-center max-w-md font-normal">Enter your email address and we'll send you a link to reset your password.</p>
-                    <form id="resetPasswordForm" novalidate class="w-full max-w-md">
-                        <div class="mb-5">
-                            <label for="resetEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
-                            <input type="email" id="resetEmail" placeholder="Enter your registered email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
-                        </div>
-                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">SEND RESET LINK</button>
-                    </form>
-                    <div id="resetMessage" class="message-area w-full max-w-md mt-4 text-center text-sm"></div>
-                    <div class="w-full max-w-md mt-6 text-center"> 
-                        <a id="backToLoginFromReset" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">&larr; Back to Login</a> 
-                    </div>
-                </div>
-
-                <div id="signupContainer" class="w-full flex-col items-center hidden">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Create Account</h2>
-                    <form id="signupForm" class="w-full max-w-md"> 
-                        <div class="mb-5">
-                            <label for="signupEmail" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Email</label>
-                            <input type="email" id="signupEmail" placeholder="Enter your email" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
-                        </div>
-                        <div class="mb-5">
-                            <label for="signupPassword" class="block mb-2 text-custom-light-gray text-sm font-light text-left">Password</label>
-                            <input type="password" id="signupPassword" placeholder="Create a password" required class="w-full p-3 border border-custom-medium-gray bg-custom-dark-gray rounded-xl text-custom-white-gray transition focus:border-custom-light-gray focus:ring focus:ring-custom-light-gray/50 focus:outline-none">
-                            <p class="text-xs text-custom-lighter-gray mt-2 text-left font-light">At least 8 characters (1 number, 1 uppercase, 1 lowercase).</p>
-                        </div>
-                        <button type="submit" class="w-full p-3 text-lg rounded-xl font-normal ring-1 ring-white/20 text-white bg-white/5 hover:bg-white/10 transition">CREATE ACCOUNT</button>
-                    </form>
-                    <div id="signupMessage" class="message-area w-full mt-4 text-center text-sm"></div>
-                    <div class="w-full max-w-md mt-6 text-center"> 
-                        <a id="backToLoginFromSignup" class="text-white hover:text-gray-300 font-normal text-sm cursor-pointer">&larr; Back to Login</a> 
-                    </div>
-                </div>
-
-                <div id="auth-code-container" class="w-full flex-col items-center hidden">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-2 text-center w-full tracking-tighter">Your Access Code</h2>
-                    <p class="text-custom-light-gray text-center mb-8">User: <span id="userEmail" class="text-white font-medium">...</span></p>
-                    
-                    <div id="generatorBox" class="flex flex-col items-center w-full max-w-md">
-                        <button id="generateBtn" class="w-full py-2 px-4 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition mb-6">
-                            Generate Code
-                        </button>
-
-                        <div id="resultContainer" class="w-full hidden flex-col items-center">
-                            <div class="code-display" id="codeOutput">XXXX-XXXX-XXXX</div>
-                            <div id="codeStatus" class="text-sm mb-4 font-normal text-center w-full"></div>
-                            <button id="copyBtn" class="w-full p-3 text-base rounded-xl font-normal border border-custom-medium-gray text-custom-white-gray hover:bg-custom-medium-gray transition flex items-center justify-center gap-2">
-                                <i class="fa-regular fa-copy"></i> Copy to Clipboard
-                            </button>
-                        </div>
-                        <div id="messageArea" class="message-area mt-4 text-center text-sm"></div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="auth-col right-col flex-1 p-8 flex flex-col items-center bg-custom-darkest-gray">
+    <main class="flex-grow">
+        <section class="text-center border-b border-gray-900 py-16">
+            <div class="mx-auto max-w-4xl px-4">
+                <h1 class="text-5xl sm:text-6xl font-light tracking-tighter mb-6 leading-tight">
+                    <span id="main-title" class="gradient-text gradient-dynu font-bold">Create a 4SP Link.</span>
+                </h1>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+                    Host your own instance of 4simpleproblems. Choose your preferred provider below to get started.
+                </p>
                 
-                <div id="unauth-social-container" class="w-full h-full flex flex-col items-center justify-center">
-                    <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">Continue instantly</h2>
-                    <p class="text-lg text-custom-light-gray mb-8 text-center max-w-md font-normal">
-                        Use a trusted provider to sign in or create an account in one click.
-                    </p>
-                    
-                    <button id="googleAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/google-icon.png" alt="Google Logo" class="w-6 h-6 mr-3">
-                        Continue with Google
-                    </button>
-                    <button id="microsoftAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/microsoft.png" alt="Microsoft Logo" class="w-6 h-6 mr-3">
-                        Continue with Microsoft
-                    </button>
-                    <button id="githubAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/github-mark-white.png" alt="GitHub Logo" class="w-6 h-6 mr-3">
-                        Continue with GitHub
-                    </button>
-                    
-                    <button id="twitterAuthBtn" class="btn-social flex items-center justify-center w-full max-w-md p-3 bg-custom-dark-gray text-custom-white-gray border border-custom-medium-gray rounded-xl font-normal cursor-pointer mb-3">
-                        <img src="https://cdn.jsdelivr.net/npm/4sp-dv@latest/images/x.png" alt="X Logo" class="w-6 h-6 mr-3">
-                        Continue with X
-                    </button>
+                <div class="flex flex-wrap justify-center gap-4 mt-8">
+                    <button onclick="switchTab('dynu')" id="btn-dynu" class="custom-tab-btn active">Dynu & GitHub</button>
+                    <button onclick="switchTab('github')" id="btn-github" class="custom-tab-btn">GitHub Pages</button>
+                    <button onclick="switchTab('cloudflare')" id="btn-cloudflare" class="custom-tab-btn">Cloudflare</button>
+                    <button onclick="switchTab('vercel')" id="btn-vercel" class="custom-tab-btn">Vercel</button>
+                    <button onclick="switchTab('fastly')" id="btn-fastly" class="custom-tab-btn">Fastly</button>
+                    <button onclick="switchTab('domain')" id="btn-domain" class="custom-tab-btn">Free Domain</button>
+                </div>
+            </div>
+        </section>
 
-                    <p class="text-xs italic text-custom-light-gray text-center max-w-md mt-4 leading-relaxed font-light">
-                        By continuing, you agree to our 
-                        <a href="../legal.html#terms-of-service" target="_blank" class="text-white hover:text-gray-300 font-normal">Terms of Service</a> and 
-                        <a href="../legal.html#privacy-policy" target="_blank" class="text-white hover:text-gray-300 font-normal">Privacy Policy</a>.
+        <div class="mx-auto max-w-6xl px-4 py-16 min-h-[500px]">
+
+            <div id="content-dynu" class="tab-content active space-y-12">
+                <div class="mb-8">
+                    <span class="text-sm font-light text-blue-400 uppercase tracking-widest mb-2 block">Free URL Hosting</span>
+                    <h2 class="text-4xl font-light mb-6">Dynu & GitHub Pages</h2>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">
+                        This method uses GitHub Pages for hosting and Dynu to create a custom, free URL for your site.
+                    </p>
+                </div>
+                <div class="space-y-12 border-l border-gray-800 pl-6">
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 0: Create a GitHub account</h3>
+                        <p class="text-gray-400 font-light mb-2">Go to <a href="https://github.com" target="_blank" class="text-blue-400 hover:underline">github.com</a> and create an account.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 1: Fork the main 4SP repository</h3>
+                        <p class="text-gray-400 font-light mb-2">Go to the current 4SP GitHub repository. Click Fork to your own account.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 2: Turn on GitHub Pages</h3>
+                        <p class="text-gray-400 font-light mb-2">Go to Settings > Pages. Set Source to <code>main</code> and <code>root</code>. Save.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 3: Fork the games repositories</h3>
+                        <p class="text-gray-400 font-light mb-2">Fork the <code>GAMES</code> repository and all <code>strongdog</code> repositories (2-5).</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 4: Create Dynu Domain</h3>
+                        <p class="text-gray-400 font-light mb-2">Create a DDNS service (Option 1) on Dynu.com.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 5: Link Dynu</h3>
+                        <p class="text-gray-400 font-light mb-2">Create a CNAME record in Dynu pointing to your <code>github.io</code> URL.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 6: Get Authorized</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            DM your link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-blue-400 hover:underline">4SP on Discord</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-github" class="tab-content space-y-12">
+                <div class="mb-8">
+                    <span class="text-sm font-light text-purple-400 uppercase tracking-widest mb-2 block">Direct Hosting</span>
+                    <h2 class="text-4xl font-light mb-6">GitHub Pages (Standard)</h2>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">
+                        The simplest method. Host directly on GitHub using a standard github.io address.
+                    </p>
+                </div>
+                <div class="space-y-12 border-l border-gray-800 pl-6">
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 1: Fork Repository</h3>
+                        <p class="text-gray-400 font-light mb-2">Fork the main 4SP repository to your GitHub account.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 2: Enable Pages</h3>
+                        <p class="text-gray-400 font-light mb-2">In Settings > Pages, enable hosting from the main branch.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 3: Fork the games repositories</h3>
+                        <p class="text-gray-400 font-light mb-2">Fork the <code>GAMES</code> repository and all <code>strongdog</code> repositories (2-5).</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 4: Authorize</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            Send your <code>username.github.io</code> link to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-purple-400 hover:underline">4SP on Discord</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-cloudflare" class="tab-content space-y-12">
+                <div class="mb-8">
+                    <span class="text-sm font-light text-orange-400 uppercase tracking-widest mb-2 block">Performance & Security</span>
+                    <h2 class="text-4xl font-light mb-6">Cloudflare Workers</h2>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">
+                        Create a high-speed proxy application using Cloudflare Workers.
                     </p>
                 </div>
 
-                <div id="auth-info-container" class="w-full h-full flex flex-col justify-between hidden">
-                    <div class="flex flex-col items-center justify-center flex-grow">
-                        <h2 class="text-3xl font-normal text-custom-white-gray mb-6 text-center w-full tracking-tighter">How to Connect</h2>
-                        <div class="max-w-md text-custom-light-gray text-lg font-light leading-relaxed space-y-4">
-                            <p>
-                                <strong class="text-white">1. Generate Code:</strong> Click the button on the left to create a unique pairing key.
-                            </p>
-                            <p>
-                                <strong class="text-white">2. Open Client:</strong> Launch the 4SP desktop application on your computer.
-                            </p>
-                            <p>
-                                <strong class="text-white">3. Link:</strong> Enter the code into the client to sync your account and unlock the toolkit.
-                            </p>
+                <div class="space-y-12 border-l border-gray-800 pl-6">
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 1: Create Application</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            Sign up or log in to <a href="https://dash.cloudflare.com/" target="_blank" class="text-orange-400 hover:underline">Cloudflare</a>.
+                        </p>
+                        <ul class="text-gray-400 font-light mt-2">
+                            <li class="step-list-item">On the dashboard sidebar, select <strong>Workers & Pages</strong>.</li>
+                            <li class="step-list-item">Click <strong>Create application</strong>.</li>
+                            <li class="step-list-item">Click <strong>Create Worker</strong> (or "Start with Hello World").</li>
+                            <li class="step-list-item">Change the name of the subdomain to anything you want (this is your link).</li>
+                            <li class="step-list-item">Click <strong>Deploy</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 2: Edit Code</h3>
+                        <p class="text-gray-400 font-light mb-4">
+                            Select which version of 4SP you want to host, then replace your worker code with the script below.
+                        </p>
+                        
+                        <div class="flex items-center gap-3 mb-2">
+                            <button onclick="setCloudflareVersion('std')" id="cf-ver-std" class="cf-ver-btn active">Host 4SP</button>
+                            <button onclick="setCloudflareVersion('max')" id="cf-ver-max" class="cf-ver-btn">Host 4SP MAX</button>
+                        </div>
+
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <div class="terminal-dot dot-red"></div>
+                                    <div class="terminal-dot dot-yellow"></div>
+                                    <div class="terminal-dot dot-green"></div>
+                                </div>
+                                <button onclick="copyCloudflareCode()" class="copy-btn">
+                                    <i class="fa-regular fa-copy"></i> Copy Code
+                                </button>
+                            </div>
+                            <pre class="terminal-body"><code id="cf-code"><span class="code-keyword">export default</span> {
+  <span class="code-keyword">async</span> <span class="code-function">fetch</span>(request, env, ctx) {
+    <span class="code-keyword">const</span> ORIGIN_HOST = <span class="code-string">"4simpleproblems.kozow.com"</span>;
+
+    <span class="code-keyword">const</span> url = <span class="code-keyword">new</span> URL(request.url);
+
+    <span class="code-comment">// Build the origin URL with full path + query</span>
+    <span class="code-keyword">const</span> originUrl = <span class="code-keyword">new</span> URL(request.url);
+    originUrl.hostname = ORIGIN_HOST;
+    originUrl.protocol = <span class="code-string">"https:"</span>;
+
+    <span class="code-comment">// Forward request to origin</span>
+    <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> fetch(originUrl.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.method === <span class="code-string">"GET"</span> || request.method === <span class="code-string">"HEAD"</span>
+        ? <span class="code-keyword">null</span>
+        : request.body,
+      redirect: <span class="code-string">"manual"</span>,
+    });
+
+    <span class="code-comment">// Clone headers so we can safely modify them</span>
+    <span class="code-keyword">const</span> newHeaders = <span class="code-keyword">new</span> Headers(response.headers);
+
+    <span class="code-comment">// Optional but recommended</span>
+    newHeaders.set(<span class="code-string">"X-Proxied-By"</span>, <span class="code-string">"Cloudflare-Worker-4SP"</span>);
+    newHeaders.set(<span class="code-string">"Cache-Control"</span>, <span class="code-string">"public, max-age=600"</span>);
+
+    <span class="code-keyword">return new</span> Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: newHeaders,
+    });
+  }
+};</code></pre>
                         </div>
                     </div>
-                    
-                    <div class="w-full flex justify-end mt-8">
-                        <button id="logoutBtn" class="py-2 px-6 text-sm font-medium rounded-xl text-indigo-500 bg-indigo-500/10 border border-indigo-500 hover:bg-indigo-500/20 transition">
-                            Sign Out <i class="fa-solid fa-arrow-right-from-bracket ml-2"></i>
-                        </button>
+
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 3: Deploy</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            Configure the target URL in the code you just pasted.
+                        </p>
+                        <ul class="text-gray-400 font-light mt-2">
+                            <li class="step-list-item">Click <strong>Save and Deploy</strong> in the top right corner.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 4: Authorize</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            Copy your final Cloudflare URL and send it to the <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-orange-400 hover:underline">4SP Discord account</a> to be authorized.
+                        </p>
                     </div>
                 </div>
-
             </div>
+
+            <div id="content-vercel" class="tab-content space-y-12">
+                <div class="mb-8">
+                    <span class="text-sm font-light text-white uppercase tracking-widest mb-2 block">Modern Deployment</span>
+                    <h2 class="text-4xl font-light mb-6">Vercel</h2>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">
+                        Deploy directly from GitHub using Vercel.
+                    </p>
+                </div>
+                <div class="space-y-12 border-l border-gray-800 pl-6">
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 1: Create Project</h3>
+                        <p class="text-gray-400 font-light mb-2">Login to Vercel, click <strong>Add New</strong> > <strong>Project</strong>.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 2: Import Code</h3>
+                        <p class="text-gray-400 font-light mb-2">Import the code from the <a href="https://github.com/4simpleproblems" target="_blank" class="text-white hover:underline">4SP GitHub Organization</a> repositories.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 3: Deploy</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            Name your project and click <strong>Deploy</strong>. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-white hover:underline">4SP on Discord</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-fastly" class="tab-content space-y-12">
+                <div class="mb-8">
+                    <span class="text-sm font-light text-red-400 uppercase tracking-widest mb-2 block">Edge Cloud</span>
+                    <h2 class="text-4xl font-light mb-6">Fastly</h2>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">
+                        Create a CDN service pointing to 4SP.
+                    </p>
+                </div>
+                <div class="space-y-12 border-l border-gray-800 pl-6">
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 1: Create Service</h3>
+                        <p class="text-gray-400 font-light mb-2">Login to Fastly. Click <strong>Create Service</strong> > <strong>CDN</strong>.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 2: Set Domain</h3>
+                        <p class="text-gray-400 font-light mb-2">Enter your Dynu domain or use <code>{name}.global.ssl.fastly.net</code>.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 3: Set Origin</h3>
+                        <p class="text-gray-400 font-light mb-2">Set Host/Origin to the URL: <code>4simpleproblems.kozow.com</code>.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 4: Activate</h3>
+                        <p class="text-gray-400 font-light mb-2">
+                            Click Activate. DM the URL to <a href="https://discord.com/users/1380703045754552340" target="_blank" class="text-red-400 hover:underline">4SP on Discord</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-domain" class="tab-content space-y-12">
+                <div class="mb-8">
+                    <span class="text-sm font-light text-green-400 uppercase tracking-widest mb-2 block">General Guide</span>
+                    <h2 class="text-4xl font-light mb-6">Get a Free Domain (Dynu)</h2>
+                    <p class="text-xl text-gray-400 font-light leading-relaxed">
+                        Create a free custom domain to use with any service.
+                    </p>
+                </div>
+                <div class="space-y-12 border-l border-gray-800 pl-6">
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 1: Sign Up</h3>
+                        <p class="text-gray-400 font-light mb-2">Create an account at <a href="https://www.dynu.com/" class="text-green-400 hover:underline">dynu.com</a>.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-light text-white mb-4">Step 2: Create URL</h3>
+                        <p class="text-gray-400 font-light mb-2">Go to DDNS Services > Add. Fill out Option 1 with your desired name.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <footer class="border-t border-gray-900 py-6">
-        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm">
+    <footer class="border-t border-gray-900 py-8 mt-auto">
+        <div class="mx-auto max-w-7xl px-4 text-center text-gray-500 text-sm font-light">
             &copy; 2025 4simpleproblems (4SP). Built for students.
+            <span class="mx-2 text-gray-800">|</span>
+            <a href="legal.html" class="hover:text-gray-300 transition">Legal</a>
         </div>
     </footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import {
-            getAuth,
-            onAuthStateChanged,
-            signOut,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            sendPasswordResetEmail,
-            sendEmailVerification,
-            fetchSignInMethodsForEmail,
-            GoogleAuthProvider,
-            GithubAuthProvider,
-            TwitterAuthProvider,
-            OAuthProvider,
-            signInWithPopup
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc,
-            deleteDoc, 
-            serverTimestamp,
-            query,
-            where,
-            getDocs,
-            limit,
-            collection,
-            writeBatch,
-            onSnapshot 
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAZBKAckVa4IMvJGjcyndZx6Y1XD52lgro",
-            authDomain: "project-zirconium.firebaseapp.com",
-            projectId: "project-zirconium",
-            storageBucket: "project-zirconium.firebasestorage.app",
-            messagingSenderId: "1096564243475",
-            appId: "1:1096564243475:web:6d0956a70125eeea1ad3e6",
-            measurementId: "G-1D4F692C1Q"
-        };
+    <script>
+        function switchTab(tabId) {
+            // Reset Buttons
+            document.querySelectorAll('.custom-tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Hide Content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            // Activate Selection
+            document.getElementById('btn-' + tabId).classList.add('active');
+            document.getElementById('content-' + tabId).classList.add('active');
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            // Update Title Gradient
+            const titleEl = document.getElementById('main-title');
+            titleEl.className = 'gradient-text font-bold'; // Reset base classes
+            if (tabId === 'dynu') titleEl.classList.add('gradient-dynu');
+            else if (tabId === 'github') titleEl.classList.add('gradient-github');
+            else if (tabId === 'cloudflare') titleEl.classList.add('gradient-cloudflare');
+            else if (tabId === 'vercel') titleEl.classList.add('gradient-vercel');
+            else if (tabId === 'fastly') titleEl.classList.add('gradient-fastly');
+            else if (tabId === 'domain') titleEl.classList.add('gradient-domain');
+        }
 
-        // UI References
-        const unauthLoginContainer = document.getElementById('unauth-login-container');
-        const resetPasswordContainer = document.getElementById('resetPasswordContainer');
-        const signupContainer = document.getElementById('signupContainer'); // New
-        const unauthSocialContainer = document.getElementById('unauth-social-container');
-        
-        const authCodeContainer = document.getElementById('auth-code-container');
-        const authInfoContainer = document.getElementById('auth-info-container');
-
-        const userEmailSpan = document.getElementById('userEmail');
-        const generateBtn = document.getElementById('generateBtn');
-        const resultContainer = document.getElementById('resultContainer');
-        const codeOutput = document.getElementById('codeOutput');
-        const codeStatus = document.getElementById('codeStatus');
-        const copyBtn = document.getElementById('copyBtn');
-        const messageArea = document.getElementById('messageArea');
-        const logoutBtn = document.getElementById('logoutBtn');
-        
-        const loginMessage = document.getElementById('loginMessage');
-        const resetMessage = document.getElementById('resetMessage');
-        const signupMessage = document.getElementById('signupMessage'); // New
-        
-        const INDIGO_CLASSES = "text-indigo-500 bg-indigo-500/10 border-indigo-500 hover:bg-indigo-500/20";
-        const CYAN_CLASSES = "text-cyan-500 bg-cyan-500/10 border-cyan-500 hover:bg-cyan-500/20";
-
-        let unsubscribeCodeListener = null;
-
-        // --- Helper: View Switcher ---
-        // This function guarantees clean switching between Login, Reset, and Signup
-        function switchView(viewName) {
-            // Hide all
-            [unauthLoginContainer, resetPasswordContainer, signupContainer].forEach(el => {
-                el.classList.add('hidden');
-                el.style.display = 'none'; // Explicitly set none to override any stuck inline styles
+        // Copy Code Function for Cloudflare
+        function copyCloudflareCode() {
+            const codeText = document.getElementById('cf-code').innerText;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Code';
+                }, 2000);
             });
-            
-            // Clear messages
-            loginMessage.innerText = "";
-            resetMessage.innerText = "";
-            signupMessage.innerText = "";
-            
-            // Show requested
-            const target = {
-                'login': unauthLoginContainer,
-                'reset': resetPasswordContainer,
-                'signup': signupContainer
-            }[viewName];
-
-            if (target) {
-                target.classList.remove('hidden');
-                target.style.display = 'flex';
-            }
         }
 
-        // --- Event Listeners for View Switching ---
-        document.getElementById('forgotPasswordLink').addEventListener('click', () => switchView('reset'));
-        document.getElementById('backToLoginFromReset').addEventListener('click', () => switchView('login'));
-        document.getElementById('goToSignupLink').addEventListener('click', () => switchView('signup'));
-        document.getElementById('backToLoginFromSignup').addEventListener('click', () => switchView('login'));
+        // Cloudflare Version Switching
+        function setCloudflareVersion(version) {
+            const stdBtn = document.getElementById('cf-ver-std');
+            const maxBtn = document.getElementById('cf-ver-max');
+            const codeEl = document.getElementById('cf-code');
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // VERIFICATION CHECK
-                if (!user.emailVerified) {
-                    await signOut(auth);
-                    switchView('login'); // Ensure we are on login view
-                    
-                    loginMessage.innerHTML = 'Your email is not verified. Please check your inbox. <a href="#" id="resend-link" class="underline cursor-pointer hover:text-white">Resend email</a>';
-                    loginMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
-                    
-                    document.getElementById('resend-link')?.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        try {
-                            await sendEmailVerification(user); 
-                            loginMessage.innerHTML = 'Verification email sent!';
-                            loginMessage.className = "message-area w-full mt-4 text-center text-sm success-message";
-                        } catch (err) {
-                            loginMessage.innerText = "Error sending email. Please log in again.";
-                        }
-                    });
-                    return; 
-                }
+            let targetHost = "4simpleproblems.kozow.com";
 
-                // LOGGED IN & VERIFIED
-                // Hide all unauth panels
-                [unauthLoginContainer, resetPasswordContainer, signupContainer, unauthSocialContainer].forEach(el => {
-                    el.classList.add('hidden');
-                    el.style.display = 'none';
-                });
-                
-                authCodeContainer.classList.remove('hidden');
-                authCodeContainer.style.display = 'flex'; 
-                authInfoContainer.classList.remove('hidden');
-                
-                userEmailSpan.textContent = user.email;
-
-                if (unsubscribeCodeListener) unsubscribeCodeListener();
-
-                try {
-                    const q = query(collection(db, "access_codes"), where("ownerUid", "==", user.uid), limit(1));
-                    unsubscribeCodeListener = onSnapshot(q, (snapshot) => {
-                        if (!auth.currentUser) return;
-                        if (!snapshot.empty) renderCodeState(snapshot.docs[0]);
-                        else renderNoCodeState();
-                    });
-                } catch (e) { console.error("Error setting up listener:", e); }
-
+            if (version === 'max') {
+                targetHost = "4sp-max.giize.com";
+                maxBtn.classList.add('active');
+                stdBtn.classList.remove('active');
             } else {
-                // LOGGED OUT
-                switchView('login'); // Default to login view
-                
-                // IMPORTANT FIX: Ensure social buttons are visible and inline style is reset to flex
-                unauthSocialContainer.classList.remove('hidden'); 
-                unauthSocialContainer.style.display = 'flex'; 
-                
-                authCodeContainer.style.display = 'none';
-                authCodeContainer.classList.add('hidden');
-                authInfoContainer.classList.add('hidden');
-                
-                if (unsubscribeCodeListener) {
-                    unsubscribeCodeListener();
-                    unsubscribeCodeListener = null;
-                }
+                stdBtn.classList.add('active');
+                maxBtn.classList.remove('active');
             }
-        });
 
-        // --- Login Handler ---
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            loginMessage.innerText = ""; 
+            // Reconstruct code block with correct host and syntax highlighting
+            codeEl.innerHTML = `<span class="code-keyword">export default</span> {
+  <span class="code-keyword">async</span> <span class="code-function">fetch</span>(request, env, ctx) {
+    <span class="code-keyword">const</span> ORIGIN_HOST = <span class="code-string">"${targetHost}"</span>;
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // State change handled by onAuthStateChanged
-            } catch (error) {
-                let msg = 'Invalid email or password.';
-                if (error.code === 'auth/too-many-requests') msg = 'Access temporarily disabled due to too many failed login attempts.';
-                else if (error.code === 'auth/user-disabled') msg = 'Your account has been disabled.';
-                loginMessage.innerText = msg;
-                loginMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
-            }
-        });
+    <span class="code-keyword">const</span> url = <span class="code-keyword">new</span> URL(request.url);
 
-        // --- Password Reset Handler ---
-        document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('resetEmail').value.trim();
-            resetMessage.innerText = "";
+    <span class="code-comment">// Build the origin URL with full path + query</span>
+    <span class="code-keyword">const</span> originUrl = <span class="code-keyword">new</span> URL(request.url);
+    originUrl.hostname = ORIGIN_HOST;
+    originUrl.protocol = <span class="code-string">"https:"</span>;
+
+    <span class="code-comment">// Forward request to origin</span>
+    <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> fetch(originUrl.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.method === <span class="code-string">"GET"</span> || request.method === <span class="code-string">"HEAD"</span>
+        ? <span class="code-keyword">null</span>
+        : request.body,
+      redirect: <span class="code-string">"manual"</span>,
+    });
+
+    <span class="code-comment">// Clone headers so we can safely modify them</span>
+    <span class="code-keyword">const</span> newHeaders = <span class="code-keyword">new</span> Headers(response.headers);
+
+    <span class="code-comment">// Optional but recommended</span>
+    newHeaders.set(<span class="code-string">"X-Proxied-By"</span>, <span class="code-string">"Cloudflare-Worker-4SP"</span>);
+    newHeaders.set(<span class="code-string">"Cache-Control"</span>, <span class="code-string">"public, max-age=600"</span>);
+
+    <span class="code-keyword">return new</span> Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: newHeaders,
+    });
+  }
+};`;
+        }
+
+        // Check for Hash on Load to switch tabs
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.substring(1); // Remove '#'
+            const validTabs = ['dynu', 'github', 'cloudflare', 'vercel', 'fastly', 'domain'];
             
-            if (!email) { 
-                resetMessage.innerText = 'Please enter your email.'; 
-                resetMessage.className = "message-area w-full max-w-md mt-4 text-center text-sm error-message";
-                return; 
+            if (hash && validTabs.includes(hash)) {
+                switchTab(hash);
             }
-
-            try {
-                const methods = await fetchSignInMethodsForEmail(auth, email);
-                if (methods.length === 0) {
-                    resetMessage.innerText = 'No account found with this email.';
-                    resetMessage.className = "message-area w-full max-w-md mt-4 text-center text-sm error-message";
-                } else if (methods.some(m => m !== 'password')) {
-                    resetMessage.innerText = 'This account uses a social provider and does not have a password to reset.';
-                    resetMessage.className = "message-area w-full max-w-md mt-4 text-center text-sm warning-message";
-                } else {
-                    await sendPasswordResetEmail(auth, email);
-                    resetMessage.innerText = 'Password reset link sent! Check your inbox.';
-                    resetMessage.className = "message-area w-full max-w-md mt-4 text-center text-sm success-message";
-                }
-            } catch (error) {
-                resetMessage.innerText = 'An error occurred. Please check the email and try again.';
-                resetMessage.className = "message-area w-full max-w-md mt-4 text-center text-sm error-message";
+        });
+        
+        // Listen for hash changes if user clicks back/forward
+        window.addEventListener('hashchange', () => {
+             const hash = window.location.hash.substring(1);
+             const validTabs = ['dynu', 'github', 'cloudflare', 'vercel', 'fastly', 'domain'];
+             if (hash && validTabs.includes(hash)) {
+                switchTab(hash);
             }
         });
 
-        // --- Sign Up Handler (New) ---
-        function validatePassword(password) {
-            if (password.length < 8) return 'Password must be at least 8 characters.';
-            if (!/[0-9]/.test(password)) return 'Password must contain at least one number.';
-            if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter.';
-            if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter.';
-            return null;
-        }
-
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            signupMessage.innerText = "";
-
-            const passError = validatePassword(password);
-            if (passError) {
-                signupMessage.innerText = passError;
-                signupMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
-                return;
-            }
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await sendEmailVerification(userCredential.user);
-                
-                // Create user doc
-                let rawUsername = email.split('@')[0];
-                let username = rawUsername.replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-                if (username.length < 6) username = `User${userCredential.user.uid.substring(0, 8)}`;
-                
-                await setDoc(doc(db, 'users', userCredential.user.uid), {
-                    email: email, 
-                    authMethod: 'email', 
-                    createdAt: serverTimestamp(),
-                    username: username, 
-                    emailVerified: false
-                });
-
-                await signOut(auth); // Force sign out so they have to login after verifying
-                
-                switchView('login');
-                loginMessage.innerText = `Account created! Verification email sent to ${email}. Please verify before logging in.`;
-                loginMessage.className = "message-area w-full mt-4 text-center text-sm success-message";
-
-            } catch (error) {
-                let msg = 'An unknown error occurred.';
-                if (error.code === 'auth/email-already-in-use') msg = 'This email is already in use.';
-                else if (error.code === 'auth/invalid-email') msg = 'The email address is not valid.';
-                else if (error.code === 'auth/weak-password') msg = 'Password is too weak.';
-                
-                signupMessage.innerText = msg;
-                signupMessage.className = "message-area w-full mt-4 text-center text-sm error-message";
-            }
-        });
-
-        // --- Common Helpers ---
-        function renderCodeState(docSnapshot) {
-            const docData = docSnapshot.data();
-            codeOutput.innerText = docSnapshot.id.match(/.{1,4}/g).join('-');
-            resultContainer.classList.remove('hidden');
-            resultContainer.style.display = 'flex';
-            
-            if (docData.claimed === true) {
-                codeStatus.innerHTML = '<span class="text-green-500"><i class="fa-solid fa-link"></i> Linked & Active</span>';
-                messageArea.innerHTML = "This code is currently in use on your local client.";
-                messageArea.className = "message-area mt-4 text-center text-sm text-gray-500";
-            } else {
-                codeStatus.innerHTML = '<span class="text-yellow-500"><i class="fa-regular fa-clock"></i> Awaiting Connection</span>';
-                messageArea.innerHTML = `Code generated. Enter it in your 4SP Local Client. <a href="../4simpleproblems_v5.html" download="4simpleproblems_v5.html" class="text-cyan-500 hover:underline cursor-pointer ml-1" title="Download 4SP Client">Download Here</a>`;
-                messageArea.className = "message-area mt-4 text-center text-sm text-custom-white-gray";
-            }
-            
-            generateBtn.innerText = "Regenerate Code";
-            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-cyan-500 transition mb-6 ${CYAN_CLASSES}`;
-            generateBtn.disabled = false;
-            generateBtn.classList.remove('hidden');
-        }
-
-        function renderNoCodeState() {
-            generateBtn.innerText = "Generate Code";
-            generateBtn.className = `w-full max-w-xs py-2 px-4 text-sm font-medium rounded-xl border border-indigo-500 transition mb-6 ${INDIGO_CLASSES}`;
-            resultContainer.classList.add('hidden');
-            resultContainer.style.display = 'none'; 
-            generateBtn.classList.remove('hidden');
-            generateBtn.disabled = false;
-            messageArea.innerText = "";
-        }
-
-        async function handleSocialAuth(provider) {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Auth error:", error);
-                alert("Authentication failed.");
-            }
-        }
-
-        document.getElementById('googleAuthBtn').addEventListener('click', () => handleSocialAuth(new GoogleAuthProvider()));
-        document.getElementById('githubAuthBtn').addEventListener('click', () => handleSocialAuth(new GithubAuthProvider()));
-        document.getElementById('twitterAuthBtn').addEventListener('click', () => handleSocialAuth(new TwitterAuthProvider()));
-        document.getElementById('microsoftAuthBtn').addEventListener('click', () => handleSocialAuth(new OAuthProvider('microsoft.com')));
-        logoutBtn.addEventListener('click', () => signOut(auth));
-
-        function generateRandomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 12; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-            return result;
-        }
-
-        generateBtn.addEventListener('click', async () => {
-            generateBtn.disabled = true;
-            generateBtn.innerText = "Generating...";
-            try {
-                const q = query(collection(db, "access_codes"), where("ownerUid", "==", auth.currentUser.uid));
-                const querySnapshot = await getDocs(q);
-                const batch = writeBatch(db);
-                querySnapshot.forEach((doc) => batch.delete(doc.ref));
-                await batch.commit();
-
-                await setDoc(doc(db, "access_codes", generateRandomCode()), {
-                    active: true, claimed: false,
-                    ownerEmail: auth.currentUser.email, ownerUid: auth.currentUser.uid,
-                    createdAt: serverTimestamp()
-                });
-            } catch (e) {
-                console.error("Error creating code:", e);
-                alert("Failed to generate code.");
-                generateBtn.disabled = false;
-                generateBtn.innerText = "Regenerate Code";
-            }
-        });
-
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(codeOutput.innerText).then(() => {
-                const prevHTML = messageArea.innerHTML;
-                const prevClass = messageArea.className;
-                messageArea.innerText = "Copied to clipboard!";
-                messageArea.className = "message-area mt-4 text-center text-sm success-message";
-                setTimeout(() => { messageArea.innerHTML = prevHTML; messageArea.className = prevClass; }, 2000);
-            });
-        });
     </script>
+
 </body>
 </html>
